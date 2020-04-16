@@ -2,6 +2,7 @@
 
 ### 网站参考
 - [Django官网](https://www.djangoproject.com/)
+- [Django中文网 2.0中文教程](https://www.django.cn/course/course-1.html)
 - [Django 教程 菜鸟教程](https://www.runoob.com/django/django-tutorial.html)
 - [Django 教程 W3CSchool](https://www.w3cschool.cn/django/)
 
@@ -40,7 +41,165 @@
             - 方法2：直接pycharm里面包管理搜索安装
             - 添加pycharm源地址为国内镜像地址
             - 参考QQ浏览器收藏夹pycharm使用或[pycharm修改镜像源方法](https://blog.csdn.net/selfimpro_001/article/details/88670584)
+            ![pip安装界面](99_Django笔记图片/001_Windows虚拟环境已安装django包.png)
+            
+- 注意：环境搭建
+- Django安装和创建项目都在虚拟环境下面开始
+        - 虚拟环境就是真实python环境的复制版
+        - windows直接pycharm创建，然后CMD切换到Scripts下activate激活，就进入虚拟环境了
+        - Ubuntu直接终端创建虚拟环境，创建后就自动进入虚拟环境了
+        - Ubuntu具体步骤参考HTML版教程的 1.1 搭建环境。常用命令如下：
+            - mkvirtualenv -p python3 py_django  创建python3下的虚拟环境名称py_django，-p参数用于指定python版本，默认是创建的python2
+            - 工作在虚拟环境上，终端提示符最前面会出现"(虚拟环境名称)"。
+            - 所有的虚拟环境，都位于/home/python/下的隐藏目录.virtualenvs下
+            - deactivate                    退出虚拟环境
+            - workon 两次tab键              查看所有虚拟环境
+            - workon py_django              进入使用虚拟环境
+            - rmvirtualenv py_django        删除虚拟环境，先退出：deactivate
+            - pip install 包名称            虚拟环境中可以使用pip命令操作python包
+            - pip list                      查看已安装的包
+            - pip freeze                    查看已安装的包
+            - 注意：在虚拟环境中不可使用sudo pip install 包名称 来安装python包，这样安装的包实际是安装在了真实的主机环境上。
+    
     
 ## 1.3 MVC    
 - MVC框架的核心思想是：解耦，让不同的代码块之间降低耦合，增强代码的可扩展性和可移植性，实现向后兼容。
-- 当前主流的开发语言如Java、PHP、Python中都有MVC框架    
+- 当前主流的开发语言如Java、PHP、Python中都有MVC框架 
+
+- Web MVC各部分的功能
+    - M全拼为Model，主要封装对数据库层的访问，对数据库中的数据进行增、删、改、查操作。
+    - V全拼为View，用于封装结果，生成页面展示的html内容。
+    - C全拼为Controller，用于接收请求，处理业务逻辑，与Model和View交互，返回结果。
+    ![MVC框架各部分功能](99_Django笔记图片/002_Web_MVC框架各部分功能.png)
+    ![MVC框架各部分功能](99_Django笔记图片/002_Web_MVC框架各部分功能演示_用户注册.png)
+     
+## 1.4 Django 简介
+- Django的主要目的是简便、快速的开发数据库驱动的网站。
+    - 它强调代码复用，多个组件可以很方便的以"插件"形式服务于整个框架，
+    - Django有许多功能强大的第三方插件，你甚至可以很方便的开发出自己的工具包。
+    - 这使得Django具有很强的可扩展性。
+    - 它还强调快速开发和DRY(Do Not Repeat Your self)原则。
+
+- Django框架遵循MVC设计，并且有一个专有名词：MVT
+    - MVT各部分的功能：
+        - M全拼为Model，与MVC中的M功能相同，负责和数据库交互，进行数据处理。
+        - V全拼为View，与MVC中的C功能相同，接收请求，进行业务处理，返回应答。
+        - T全拼为Template，与MVC中的V功能相同，负责封装构造要返回的html。
+        - 差异就在于黑线黑箭头标识出来的部分:
+        ![MVC框架各部分功能](99_Django笔记图片/003_Django_MVT各部分的功能.png)
+ 
+        
+# 2 创建一个项目
+## 2.1 创建 Django 项目
+- 虚拟环境下，进入 01_StartProject 目录下执行创建项目命令：
+    - django-admin startproject test1   
+    - tree /f  查看文件夹 tree 树形结构
+    ![创建Django项目](99_Django笔记图片/004_创建Django项目.png)
+    - 项目各文件说明：
+        - manage.py是项目管理文件，通过它管理项目。
+        - 与项目同名的目录，此处为test1。
+        - \_init_.py是一个空文件，作用是这个目录test1可以被当作包使用。
+        - settings.py是项目的整体配置文件。
+        - urls.py是项目的URL配置文件。
+        - wsgi.py是项目与WSGI兼容的Web服务器入口，详细内容会在布署中讲到
+        
+## 2.2 创建应用
+- 进入 test1 项目文件夹下创建应用，执行以下命令
+    - python manage.py startapp booktest
+    - tree /f  查看文件夹 tree 树形结构
+    ![创建Django应用](99_Django笔记图片/005_Django项目下创建应用.png)
+    - 项目各文件说明：
+        - \_init.py_是一个空文件，表示当前目录booktest可以当作一个python包使用。
+        - tests.py文件用于开发测试用例，在实际开发中会有专门的测试人员，这个事情不需要我们来做。
+        - models.py文件跟数据库操作相关。
+        - views.py文件跟接收浏览器请求，进行处理，返回页面相关。
+        - admin.py文件跟网站的后台管理相关。
+        - migrations文件夹之后给大家介绍。
+
+- 安装应用
+    - 应用创建成功后，需要安装才可以使用，也就是建立应用和项目之间的关联，
+    - 在test1/settings.py中INSTALLED_APPS下添加应用的名称就可以完成安装。
+    - INSTALLED_APPS 列表元素末尾添加：'booktest',
+
+- 开发服务器
+    - 在开发阶段，为了能够快速预览到开发的效果，django提供了一个纯python编写的轻量级web服务器，仅在开发阶段使用。
+    - 运行服务器命令如下：
+        - python manage.py runserver ip:端口
+        - python manage.py runserver
+        - 可以不写IP和端口，默认IP是127.0.0.1，默认端口为8000。
+        - 紧接着在浏览器中输入网址：127.0.0.1:8000，可以查看当前站点开发效果。
+    - ctrl + c  退出服务器，按下后需要等待一小会儿才会停止服务器
+
+    
+# 3 Django 基本知识
+## 3.1 设计模型
+- ORM框架
+    - O是object，也就类对象的意思，
+    - R是relation，翻译成中文是关系，也就是关系数据库中数据表的意思，
+    - M是mapping，是映射的意思。
+    - 在ORM框架中，它帮我们把类和数据表进行了一个映射，可以让我们通过类和类对象就能操作它所对应的表格中的数据。
+    - ORM框架还有一个功能，它可以根据我们设计的类自动帮我们生成数据库中的表格，省去了我们自己建表的过程。
+    ![ORM框架](99_Django笔记图片/006_ORM框架.png)
+
+- django中内嵌了ORM框架，不需要直接面向数据库编程，而是定义模型类，通过模型类和对象完成数据表的增删改查操作。
+    - 使用django进行数据库开发的步骤如下：
+    - 1.在models.py中定义模型类
+    - 2.迁移
+    - 3.通过类和对象完成数据增删改查操作
+     
+- 具体实例：
+- 1.定义模型类
+        - 模型类定义在/booktest/models.py文件中，继承自models.Model类。
+- 2.迁移由两步完成: 
+    - 注意：ctrl + c 退出服务器模式，虚拟环境下执行命令
+    - 2.1.生成迁移文件：根据模型类生成创建表的迁移文件。
+        - python manage.py makemigrations
+        - 迁移文件位置：/booktest/migrations/0001_initial.py
+        - Django框架根据我们设计的模型类生成了迁移文件，
+        - 在迁移文件中我们可以看到fields列表中每一个元素跟BookInfo类属性名以及属性的类型是一致的。
+        - 同时我们发现多了一个id项，这一项是Django框架帮我们自动生成的，
+        - 在创建表的时候id就会作为对应表的主键列，并且主键列自动增长。
+        
+    - 2.2.执行迁移：根据第一步生成的迁移文件在数据库中创建表。
+        - python manage.py migrate
+        - Django默认采用sqlite3数据库
+        - 数据表的默认名称为：
+            - <app_name>_<model_name>
+            - booktest_bookinfo
+    - 上面执行结果如下：
+    ![数据库开发过程](99_Django笔记图片/007_数据库开发过程.png)
+    
+- sqlite3数据库可视化操作：
+    - sqlite3是一个轻量化的数据库，口语直接使用Navicat Premium软件打开文件操作
+    - Navicat Premium--->文件--->新建连接--->Sqlite--->写上连接名--->现有数据库文件--->选择本地的sqlite3文件确定即可
+    - 就可以打开查看操作数据库了
+    ![sqlite3可视化操作](99_Django笔记图片/008_sqlite3可视化操作.png)
+      
+- 3.数据操作
+    - 成数据表的迁移之后，下面就可以通过进入项目的shell，进行简单的API操作。
+    - 如果需要退出项目，可以使用ctrl+d快捷键或输入quit()。
+    - 进入项目shell的命令：
+        - python manage.py shell
+    
+    - 第一次写入数据错误记录
+        - 错误提示：django.db.utils.OperationalError: table booktest_bookinfo has no column named bpub_date
+        - 错误原因：1 中定义模型将bpub_date写成bpub_title了，可以查看008图片
+        - 错误解决：先修改模型中定义名称，然后重新生成迁移文件和执行迁移
+        ![数据操作_错误记录](99_Django笔记图片/009_sqlite3数据操作错误记录.png)
+    
+    - 写入数据：
+        - 进入shell终端后就可以，写入数据了，写入后记得保存
+        - BookInfo.objects.all()  查看数据
+        - 保存后，再次写入(实际是修改，因为用的是同一个实例对象)，然后保存，会直接覆盖之前的数据，参考下图
+        ![数据操作_存入数据](99_Django笔记图片/010_sqlite3数据操作_存入数据.png)
+        - 注意：写入数据和查询数据都需要先创建一个实例对象
+            - 写入数据时，创建类的实例对象：b=BookInfo()
+            - 查询数据时，创建指定的实例对象，指定id值：b=BookInfo.objects.get(id=1)
+    
+    - 查询，修改，删除数据：
+        - 注意：始终用同一个实例对象，就可以对该对象进行多个操作
+        - 和写入时候一样，查询属性的值
+        - 修改后需要执行保存命令：b.save
+        - 删除数据：b.delete()
+        - 具体参考下图，依次是查询-修改-删除
+        ![数据操作_查询修改数据](99_Django笔记图片/011_sqlite3数据操作_查询修改数据.png)
