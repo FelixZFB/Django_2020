@@ -123,7 +123,7 @@
 
 - 开发服务器
     - 在开发阶段，为了能够快速预览到开发的效果，django提供了一个纯python编写的轻量级web服务器，仅在开发阶段使用。
-    - 运行服务器命令如下：
+    - 运行服务器命令如下,终端要切换到项目文件夹/test1下下执行：
         - python manage.py runserver ip:端口
         - python manage.py runserver
         - 可以不写IP和端口，默认IP是127.0.0.1，默认端口为8000。
@@ -146,15 +146,19 @@
     - 1.在models.py中定义模型类
     - 2.迁移
     - 3.通过类和对象完成数据增删改查操作
+ 
      
-- 具体实例：
+## 3.2 模型类实例
+- 注意：所有命令要终端要切换到项目文件夹/test1下下执行
+    - 虚拟环境项目文件夹路径如下：
+    - (venv) D:\PyProject\Django_2020\01_StartProject\test1> 
 - 1.定义模型类
         - 模型类定义在/booktest/models.py文件中，继承自models.Model类。
 - 2.迁移由两步完成: 
     - 注意：ctrl + c 退出服务器模式，虚拟环境下执行命令
     - 2.1.生成迁移文件：根据模型类生成创建表的迁移文件。
         - python manage.py makemigrations
-        - 迁移文件位置：/booktest/migrations/0001_initial.py
+        - 生成的迁移文件位置：/booktest/migrations/0001_initial.py
         - Django框架根据我们设计的模型类生成了迁移文件，
         - 在迁移文件中我们可以看到fields列表中每一个元素跟BookInfo类属性名以及属性的类型是一致的。
         - 同时我们发现多了一个id项，这一项是Django框架帮我们自动生成的，
@@ -162,8 +166,9 @@
         
     - 2.2.执行迁移：根据第一步生成的迁移文件在数据库中创建表。
         - python manage.py migrate
+        - 生成的数据表文件位置：/test1/db.sqlite3
         - Django默认采用sqlite3数据库
-        - 数据表的默认名称为：
+        - 生成的数据表的默认名称为：
             - <app_name>_<model_name>
             - booktest_bookinfo
     - 上面执行结果如下：
@@ -199,7 +204,67 @@
     - 查询，修改，删除数据：
         - 注意：始终用同一个实例对象，就可以对该对象进行多个操作
         - 和写入时候一样，查询属性的值
+        - 创建查询对象：b=BookInfo.objects.get(id=1) (注意：该处对象名称可以不用b,可以写成b1,避免混淆)
+            - b.title
+            - b.pub_date
         - 修改后需要执行保存命令：b.save
         - 删除数据：b.delete()
         - 具体参考下图，依次是查询-修改-删除
         ![数据操作_查询修改数据](99_Django笔记图片/011_sqlite3数据操作_查询修改数据.png)
+        
+- 4.添加一个新的模型类，英雄类
+    - models.py添加英雄类，注意设置外键时候django1.8版本以后需要on_delete参数，不然会报以下错误
+        - __init__() missing 1 required positional argument: 'on_delete'
+        - 生成迁移文件错误，可以直接删除migrations下面的0001和0002文件和db.sqlite3文件，然后重新执行生成文件和执行迁移命令
+        - 详细参考以下两篇博文：
+            - https://www.cnblogs.com/phyger/p/8035253.html
+            - https://www.cnblogs.com/cpl9412290130/p/9608331.html
+    - 分别执行生成迁移文件，执行迁移命令:
+        - python manage.py makemigrations
+        - python manage.py migrate
+    ![添加一个新的模型类](99_Django笔记图片/012_添加一个新的模型类_执行过程.png) 
+    - 图书与英雄是一对多的关系，django中提供了关联的操作方式。
+        - 获得关联集合：返回当前book对象的所有hero
+        - b.heroinfo_set.all()
+        - 一（图书对象）对多（英雄名称类小写加上下划线和set）
+- 5.操作补充：
+    - 查询图书表里面的所有内容。
+	    - BookInfo.objects.all()
+	    - HeroInfo.objects.all()
+	- 查询出id为2的图书中所有英雄人物的信息。
+	    - 第一步，创建图书的对象：b = BookInfo.objects.get(id=2)
+	    - 第二步，查询所有关联的英雄对象：b.heroinfo_set.all() #查询出b图书中所有英雄人物的信息
+
+## 3.3 后台管理 
+- Django能够根据定义的模型类自动地生成管理页面。
+- 使用Django的管理模块，需要按照如下步骤操作：
+    - 具体步骤查看Django框架教程HTML版 1.4 节
+    - 1.管理界面本地化
+        - 本地化是将显示的语言、时间等使用本地的习惯，
+        - 这里的本地化就是进行中国化，中国大陆地区使用简体中文，时区使用亚洲/上海时区
+        - 语言和时区的本地化。
+        - 修改settings.py文件
+    - 2.创建管理员
+        - 创建管理员的命令如下，按提示输入用户名、邮箱、密码
+        - 用户名：admin  邮箱和密码自定义设置（182...@qq.com, z1z)
+        - 命令：python manage.py createsuperuser
+        - 接下来启动服务器：python manage.py runserver
+        - 打开浏览器，在地址栏中输入如下地址后回车：http://127.0.0.1:8000/admin/
+        - 输入前面创建的用户名、密码完成登录
+    - 3.注册模型类
+        - 登录后台管理后，默认没有我们创建的应用中定义的模型类，
+        - 需要在自己应用中的admin.py文件中注册，才可以在后台管理中看到，并进行增删改查操作
+        - 默认没有我们创建的应用中定义的模型类，需要在自己应用中的booktest/admin.py文件中注册，才可以在后台管理中看到，并进行增删改查操作
+    - 4.自定义管理页面
+        - 自定义模型管理类。模型管理类就是告诉django在生成的管理页面上显示哪些内容
+        - 列表页只显示出了BookInfo object，对象的其它属性并没有列出来，查看非常不方便。
+        - Django提供了自定义管理页面的功能，比如列表页要显示哪些值。
+        - 打开booktest/admin.py文件，自定义类，继承自admin.ModelAdmin类
+        - 详细说明查看admin.py文件及其注释
+    - 注意：
+        - 后台管理默认显示的是
+            - Bookinfo object(1)  
+            - Bookinfo object(1)
+        - 该名称是有/booktest/models.py中的__str__方法决定的
+        - 我们可以修改该方法，让后台显示对象的名称，查看models.py
+  
