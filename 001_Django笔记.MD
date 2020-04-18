@@ -60,7 +60,10 @@
             - pip list                      查看已安装的包
             - pip freeze                    查看已安装的包
             - 注意：在虚拟环境中不可使用sudo pip install 包名称 来安装python包，这样安装的包实际是安装在了真实的主机环境上。
-    
+        - virtualenv是如何创建“独立”的Python运行环境的呢？
+            - 原理很简单，就是把系统Python复制一份到virtualenv的环境，
+            - 用命令source venv/bin/activate进入一个virtualenv环境时，
+            - virtualenv会修改相关环境变量，让命令python和pip均指向当前的virtualenv环境。
     
 ## 1.3 MVC    
 - MVC框架的核心思想是：解耦，让不同的代码块之间降低耦合，增强代码的可扩展性和可移植性，实现向后兼容。
@@ -127,6 +130,10 @@
         - python manage.py runserver ip:端口
         - python manage.py runserver
         - 可以不写IP和端口，默认IP是127.0.0.1，默认端口为8000。
+        - 如果本地启动多个django服务器，可以指定不同的端口号，先进入各自项目的虚拟环境，然后切换到项目文件夹下，运行服务
+        - python manage.py runserver 127.0.0.1:8000
+        - python manage.py runserver 127.0.0.1:8001
+        - python manage.py runserver 127.0.0.1:8002
         - 紧接着在浏览器中输入网址：127.0.0.1:8000，可以查看当前站点开发效果。
     - ctrl + c  退出服务器，按下后需要等待一小会儿才会停止服务器
 
@@ -138,12 +145,12 @@
     - db.sqlite3 是默认使用的数据库文件
     - manage.py 项目管理文件，通过它管理项目
 
-## 3.1 设计模型
+## 3.1 设计模型 (models.py)
 - ORM框架
     - O是object，也就类对象的意思，
     - R是relation，翻译成中文是关系，也就是关系数据库中数据表的意思，
     - M是mapping，是映射的意思。
-    - 在ORM框架中，它帮我们把类和数据表进行了一个映射，可以让我们通过类和类对象就能操作它所对应的表格中的数据。
+    - 在ORM框架中，它帮我们把 类和数据表进行了一个映射，可以让我们通过类和类对象就能操作它所对应的表格中的数据。
     - ORM框架还有一个功能，它可以根据我们设计的类自动帮我们生成数据库中的表格，省去了我们自己建表的过程。
     ![ORM框架](99_Django笔记图片/006_ORM框架.png)
 
@@ -191,6 +198,8 @@
     - 如果需要退出项目，可以使用ctrl+d快捷键或输入quit()。
     - 进入项目shell的命令：
         - python manage.py shell
+        - from booktest.models import BookInfo,HeroInfo  首先引入booktest/models中的类
+        - BookInfo.objects.all()  查询所有图书信息
     
     - 第一次写入数据错误记录
         - 错误提示：django.db.utils.OperationalError: table booktest_bookinfo has no column named bpub_date
@@ -250,7 +259,7 @@
         - 本地化是将显示的语言、时间等使用本地的习惯，
         - 这里的本地化就是进行中国化，中国大陆地区使用简体中文，时区使用亚洲/上海时区
         - 语言和时区的本地化。
-        - 修改settings.py文件
+        - 修改项目的settings.py文件(/test1/settings.py) 
     - 2.创建管理员
         - 创建管理员的命令如下，按提示输入用户名、邮箱、密码
         - 用户名：admin  邮箱和密码自定义设置（182...@qq.com, z1z)
@@ -277,3 +286,93 @@
 
 
 ## 3.4 视图 (views.py) 
+- 访问http://127.0.0.1:8000/admin/ 进入后台管理界面
+- 服务器在收到这个请求之后，就一定对应着一个处理动作，这个处理动作就是帮我们产生页面内容并返回回来，这个过程是由视图来做的
+
+- 对于django的设计框架MVT，用户在URL中请求的是视图，视图接收请求后进行处理，并将处理的结果返回给请求者
+
+- 视图时需要进行两步操作：
+    - 1.定义视图函数
+        - 视图就是一个Python函数，被定义在views.py中
+        - 视图的必须有一个参数，一般叫request，视图必须返回HttpResponse对象，HttpResponse中的参数内容会显示在浏览器的页面上。
+        - 具体查看：booktest/views.py
+    - 2.配置URLconf
+        - 查找视图的过程：
+            - 请求者在浏览器地址栏中输入url，请求到网站后，获取url信息，然后与编写好的URLconf逐条匹配，
+            - 如果匹配成功则调用对应的视图函数，如果所有的URLconf都没有匹配成功，则返回404错误。
+        - 一条URLconf包括url规则、视图两部分：
+            - url规则使用正则表达式定义。
+            - 视图就是在views.py中定义的视图函数。
+        - 需要两步完成URLconf配置：
+            - 1.在应用中定义URLconf，具体查看：booktest/urls.py
+            - 2.包含到项目的URLconf中，应用中的urls.py需要自己新建，具体查看：test1/urls.py
+        - 注意点：
+            - urls文件，django2.0以前路径是使用的url，后面版本都使用path
+            - 正则表达式需要严格匹配url地址的开头和结尾
+    ![配置视图函数1](99_Django笔记图片/013_url配置视图函数返回结果1.png) 
+    ![url地址匹配不到的报错情况](99_Django笔记图片/014_url地址匹配不到的报错情况_包含url匹配时候查找顺序.png) 
+
+
+## 3.5 模板 (templates) 
+- 如何向请求者返回一个漂亮的页面呢？
+    - 肯定需要用到html、css，如果想要更炫的效果还要加入js，问题来了，
+    - 这么一堆字段串全都写到视图中，作为HttpResponse()的参数吗？这样定义就太麻烦了吧
+    - 在Django中，将前端的内容定义在模板中，然后再把模板交给视图调用，各种漂亮、炫酷的效果就出现了
+
+- 创建模板文件
+    - 项目目录下创建模板文件夹：templates
+    - 每个应用单独在模板下面创建一个应用同名的文件夹：booktest
+    - 应用文件夹里面创建具体的模板文件，比如：index.html
+    - 结构就是：test1/templates/booktest/index.html
+    - 注意，settings.py 里面需要设置模板文件夹的路径
+
+- 定义模板文件
+    - templtes/booktest/index.html文件
+    - 在模板中输出变量语法如下，变量可能是从视图中传递过来的，也可能是在模板中定义的
+        - {{变量名}}
+        - {{title}}
+    - 在模板中编写代码段语法如下：
+        - {%代码段%}
+        - {%for i in list%}
+        - {{i}}<br>
+        - {%endfor%}
+        - 注意使用for循环代码后，末尾要写上结束代码
+    - 具体查看index.html文件和views.py视图文件
+    
+- 视图调用模板
+    - 1.找到模板
+    - 2.定义上下文 context
+    - 3.渲染模板 render
+    - 具体查看views.py视图文件中index函数里面的方式2，使用模板文件
+    ![模板文件使用](99_Django笔记图片/015_模板文件使用自定义模板变量传递数据.png) 
+    
+    
+## 3.6 简单的综合实例
+- 目标：请求一个网址，连接数据库，取出数据，展示在浏览器中
+    - 请求该网址：http://127.0.0.1:8000/show_books
+    - 浏览器展示所有的图书信息，
+    - 请求该网址：http://127.0.0.1:8000/books/1
+    - 浏览器显示图书信息以及包含的英雄信息
+    - M全拼为Model: 模型，连接数据库，取出数据
+    - V全拼为View：视图，接收request请求，进行业务处理，返回response。
+    - T全拼为Template：模板，负责封装构造要返回的html。
+
+- 具体步骤：
+    - 包括三个方面，三个方面顺序不分先后。
+    - 1.定义视图views.py
+        - show_books函数：查询数据库，返回所有图书信息，然后调用模板，然后展示出来
+        - detail函数：
+            - 点击图书连接,连接里面包含图书的id，展示图书及英雄信息。
+            - 图书id作为参数传给detail函数，然后获取图书关联的英雄信息
+            - 返回信息，调用模板，然后展示出来
+            - 正则表达式中的分组会自动作为参数传给视图中的函数
+    - 2.定义URLconf, 应用booktest下的urls，项目test1下的urls上面3.4节中已经配置了
+    - 3.定义模板文件
+
+- 运行：
+    - 启动服务器：python manage.py runserver
+    - http://127.0.0.1:8000/show_books
+    - 点击图书进入详情页：
+        - http://127.0.0.1:8000/books/1
+        - http://127.0.0.1:8000/books/2
+

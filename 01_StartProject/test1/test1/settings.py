@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# 项目文件夹的绝对路径，项目文件后期移动到其它位置，对其它地方使用了项目路径的地方不受影响
+# 下面设置中TEMPLATES模板路径和DATABASES数据库路径都是使用BASE_DIR进行拼接的
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -55,7 +57,7 @@ ROOT_URLCONF = 'test1.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], # templates模板路径,使用项目文件夹路径和templates文件夹进行拼接，即使项目移动到其它位置，也不会出现路径错误
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

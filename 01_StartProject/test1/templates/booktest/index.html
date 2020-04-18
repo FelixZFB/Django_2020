@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我是模板文件</title>
+</head>
+<body>
+    <div>我是模板文件</div>
+    <br>
+    <div>下面使用模板变量，格式是使用两个大括号，大括号里面就是views.py视图函数context中字典中的键的名称</div>
+    <br>
+    <div>{{title}}</div>
+    <br>
+    <div>代码中使用python语法，一对大括号，括号里面有一对%百分号，还要写上结束代码语句</div>
+    <br>
+    {%for i in list%}
+    {{i}}<br>
+    {%endfor%}
+</body>
+</html>
