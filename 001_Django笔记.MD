@@ -130,8 +130,14 @@
         - 紧接着在浏览器中输入网址：127.0.0.1:8000，可以查看当前站点开发效果。
     - ctrl + c  退出服务器，按下后需要等待一小会儿才会停止服务器
 
-    
+
 # 3 Django 基本知识
+- Django 项目整体说明，以第 2 节创建的 test1 为例
+    - /test1/test1 里面是django项目整体配置
+    - /test1/booktest 里面是应用的相关配置
+    - db.sqlite3 是默认使用的数据库文件
+    - manage.py 项目管理文件，通过它管理项目
+
 ## 3.1 设计模型
 - ORM框架
     - O是object，也就类对象的意思，
@@ -148,7 +154,7 @@
     - 3.通过类和对象完成数据增删改查操作
  
      
-## 3.2 模型类实例
+## 3.2 模型类实例 (models.py)
 - 注意：所有命令要终端要切换到项目文件夹/test1下下执行
     - 虚拟环境项目文件夹路径如下：
     - (venv) D:\PyProject\Django_2020\01_StartProject\test1> 
@@ -235,7 +241,8 @@
 	    - 第一步，创建图书的对象：b = BookInfo.objects.get(id=2)
 	    - 第二步，查询所有关联的英雄对象：b.heroinfo_set.all() #查询出b图书中所有英雄人物的信息
 
-## 3.3 后台管理 
+
+## 3.3 后台管理 (admin.py)
 - Django能够根据定义的模型类自动地生成管理页面。
 - 使用Django的管理模块，需要按照如下步骤操作：
     - 具体步骤查看Django框架教程HTML版 1.4 节
@@ -248,7 +255,7 @@
         - 创建管理员的命令如下，按提示输入用户名、邮箱、密码
         - 用户名：admin  邮箱和密码自定义设置（182...@qq.com, z1z)
         - 命令：python manage.py createsuperuser
-        - 接下来启动服务器：python manage.py runserver
+        - 接下来启动服务器：python manage.py runserver （退出服务器 ctrl + c）
         - 打开浏览器，在地址栏中输入如下地址后回车：http://127.0.0.1:8000/admin/
         - 输入前面创建的用户名、密码完成登录
     - 3.注册模型类
@@ -267,4 +274,6 @@
             - Bookinfo object(1)
         - 该名称是有/booktest/models.py中的__str__方法决定的
         - 我们可以修改该方法，让后台显示对象的名称，查看models.py
-  
+
+
+## 3.4 视图 (views.py) 
