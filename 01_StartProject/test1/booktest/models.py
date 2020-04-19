@@ -11,7 +11,7 @@ class BookInfo(models.Model):
     # DateField说明是一个日期类型
     bpub_date = models.DateField()
 
-    # 该魔法方法用于django后台管理, 对象以什么显示，此处对象设置为以名称显示
+    # 该魔法方法用于django后台管理, 对象以什么显示，此处对象设置为以名称显示,admin.py中设置对象展示方式该方法自动忽略
     def __str__(self):
         return self.btitle
 
@@ -27,8 +27,9 @@ class HeroInfo(models.Model):
     hgender = models.BooleanField()
     hcomment = models.CharField(max_length=100)
     # BookInfo类和HeroInfo类之间具有一对多的关系，这个一对多的关系应该定义在多的那个类，也就是HeroInfo类中
+    # 注意设置外键时候django1.8版本以后需要on_delete参数，不然会错误
     hbook = models.ForeignKey('BookInfo', on_delete=models.CASCADE) # 让BookInfo类和HeroInfo类之间建立了一对多的关系
 
-    # 该魔法方法用于django后台管理, 对象以什么显示，此处对象设置为以名称显示
+    # 该魔法方法用于django后台管理, 对象以什么显示，此处对象设置为以名称显示,admin.py中设置对象展示方式该方法自动忽略
     def __str__(self):
         return self.hname

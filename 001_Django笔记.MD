@@ -280,9 +280,10 @@
     - 注意：
         - 后台管理默认显示的是
             - Bookinfo object(1)  
-            - Bookinfo object(1)
+            - Bookinfo object(2)
         - 该名称是有/booktest/models.py中的__str__方法决定的
         - 我们可以修改该方法，让后台显示对象的名称，查看models.py
+        - 注意：admin.py中设置对象展示方式后该方法自动忽略
 
 
 ## 3.4 视图 (views.py) 
@@ -376,3 +377,151 @@
         - http://127.0.0.1:8000/books/1
         - http://127.0.0.1:8000/books/2
 
+# 4 模型（Model）
+## 4.1 Django 中的 ORM
+- ORM，全拼Object-Relation Mapping，中文意为对象-关系映射，是随着面向对象的软件开发方法发展而产生的。
+- 在MVC框架中的Model模块中都包括ORM，对于开发人员主要带来了如下好处：
+    - 实现了数据模型与数据库的解耦，通过简单的配置就可以轻松更换数据库，而不需要修改代码。
+    - 只需要面向对象编程，不需要面向数据库编写代码。
+    - 在MVC中Model中定义的类，通过ORM与关系型数据库中的表对应，对象的属性体现对象间的关系，这种关系也被映射到数据表中。
+
+- Django框架中ORM示意图如下:
+![Django中的ORM示意图详解](99_Django笔记图片/016_Django中的ORM示意图详解.png) 
+
+## 4.2 Django 配置 MySQL 数据库
+- Django默认使用的是sqlite3轻量化数据库，以项目test2为例
+- Django配置使用MySQL数据库
+
+- 1.创建项目test2
+    - 在/Django_2020/01_StartProject目录下创建项目test2 (里面已有第 3 章创建的 test1 项目)
+    - 激活进入Django_2020项目虚拟环境，切换到01_StartProject文件夹下创建项目：
+    - 执行命令：django-admin startproject test2
+    - 项目结构如下：
+        ```
+        - test2
+            - manage.py
+            │
+            └─test2
+                asgi.py
+                settings.py
+                urls.py
+                wsgi.py
+                __init__.py
+        ```
+- 2.test2项目下创建应用booktest
+    - 切换到test2目录下，执行命令：
+    - python manage.py startapp booktest
+    - 注册应用，/test2/settings.py中的INSTALLED_APPS列表末尾添加
+    - 'booktest', # 注册自定义的应用，注意逗号写上
+    
+- 3.数据库配置，使用mysql数据库
+    - DATABASE配置mysql数据库：
+        - 将引擎改为mysql，提供连接的主机HOST、端口PORT、数据库名NAME、用户名USER、密码PASSWORD
+        - 修改/test2/settings.py中的DATABASES，将默认的sqlite3的两行代码注释掉，具体设置如下：
+        - 先本地进入mysql数据库，创建一个django_test2作为本项目使用的数据库
+        - 创建命令：create database django_test2 charset=utf8;
+        - 注意：数据库 Django框架不会自动生成，需要我们自己进入mysql数据库去创建，使用上面命令
+            ```python
+            DATABASES = {
+                'default': {
+                    # 'ENGINE': 'django.db.backends.sqlite3',
+                    # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+                    'ENGINE': 'django.db.backends.mysql', #使用mysql数据库
+                    'NAME': 'django_test2', #使用的数据库database的名字，已经提取创建好
+                    'USER': 'root', #数据库登录用户名，默认就是root
+                    'PASSWORD': '00116656', #数据库登录密码,数据库安装时候设置的用户密码
+                    'HOST': 'localhost', #数据库所在主机的IP地址，本机直接用localhost
+                    'PORT': '3306', #数据库端口，默认就是3306
+                }
+            }
+            ```    
+    - 安装pymysql包，配置pymysql：
+        - 安装pymysql包，用于python连接操作mysql数据库
+        - 虚拟环境下执行：pip install pymysql
+        - /test2/\__init\__.py文件中配置pymsql，加入以下两句代码：
+            - import pymysql
+            - pymysql.install_as_MySQLdb()
+        
+- 4. 启动服务器：
+- 运行：
+    - 启动服务器：python manage.py runserver
+    - http://127.0.0.1:8000
+    
+- 版本兼容性问题：
+    - 注意上面mysql配置对于django2.2之前版本没有问题，但是2.2之后会报错：
+    - ImproperlyConfigured: mysqlclient 1.3.13 or newer is required
+    - 解决方法：
+        - 卸载pymysql包：pip uninstall pymysql
+        - 注释掉/test2/\__init\__.py中添加的两行代码
+        - 安装mysqlclient包：pip install mysqlclient
+        - django 2.2以后都是使用mysqlclient包了
+        - 具体参考该博文：
+        - [django 2.2与mysql兼容性问题](https://blog.csdn.net/lpw_cn/article/details/103978909)
+        ![Django与MySQL兼容性报错解决1](99_Django笔记图片/017_Django与MySQL兼容性报错解决.png) 
+        ![Django与MySQL兼容性报错解决2](99_Django笔记图片/018_Django与MySQL兼容性报错解决后成功启动django.png) 
+    - pymysql和mysqlclient操作mysql数据库区别：
+        - 导入的包不同
+        - mysqlclient创建连接比pymysql前面多加一个MySQLdb
+        - 就是创建连接时候有点区别，其它操作都一样
+        - 具体参考下图：
+        ![pymysql和mysqlclient操作mysql数据库对比](99_Django笔记图片/019_pymysql和mysqlclient操作mysql数据库对比.png) 
+        - 博文参考：[通过mysqlclient操作MySQL数据库]()
+
+- 上面步骤都成功后，django配置mysql数据库完成。
+       
+## 4.3 设计模型
+- /booktest/model.py自定义模型，具体查看模型文件
+- 生成迁移文件和执行迁移命令，让其在mysql数据库中生成和模型内相应的数据表
+    - python manage.py makemigrations
+    - python manage.py migrate
+    
+## 4.4 启动查看数据库
+- 打开一个终端，启动本地mysql数据库
+    - 使用dango_test2数据库文件：use dango_test2; 
+    - 查看是否有自定义的模型对应的数据表：show tables;
+    - 查看数据表详细信息：
+        - desc booktest_bookinfo;
+        - desc booktest_heroinfo;
+        ![连接启动mysql数据库](99_Django笔记图片/020_模型生成数据表_连接启动mysql数据库.png) 
+        
+## 4.5 数据库操作
+- mysql终端插入数据，然后进django后台查看
+- 后台管理，参考3.3节，修改test2/settings.py和booktest/admin.py
+    - 1.本地化设置
+    - 2.创建管理员
+    - 3.注册模型
+    - 4.自定义展示后台
+- 启动django服务器进入后台
+    - python manage.py runserver
+    - http://127.0.0.1:8000/admin
+    ![mysql数据库增加数据Django后台管理查看数据](99_Django笔记图片/021_mysql数据库增加数据Django后台管理查看数据.png) 
+    
+## 4.6 项目 MVT 配置
+- M模型4.3已经完成
+    - 编写/booktest/models.py文件
+
+- V视图(参考3.4节)
+    - 定义视图函数: /booktst/views.py
+    - 配置URLconf(应用和项目下的urls.py): 
+        - /booktst/urls.py
+        - /test2/urls.py
+    - from booktest import views 导入时候注意问题：
+        - 此处导入注意，由于test1和test2项目文件都标记为了source root
+        - 此处搜索booktest时候开始按循序先搜到了test1文件中的，然后导入的views就是test1中的
+        - 解决方法，不同项目尽量不要使用相同的名称，可以避免
+        - 折中方法：先取消test1文件夹标记，test2标记，test1标记时候取消test2标记
+
+- T模板(参考3.5节)
+    - 创建模板文件: /templates/booktest/
+        - index.html
+        - detail.html
+    - 配置模板文件路径: /test2/settings.py 中设置
+
+- 服务器运行状态，访问
+    - http://127.0.0.1:8000/index    图书列表首页
+    - http://127.0.0.1:8000/books/1  或者2或者3图书详情页
+    - 图书列表展示_图书详情展示_新增图书_删除图书执行效果如下：
+    ![图书列表展示_图书详情展示_新增图书_删除图书](99_Django笔记图片/022_图书列表展示_图书详情展示_新增图书_删除图书.png)     
+  
+    
+  

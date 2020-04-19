@@ -1,4 +1,4 @@
-"""test1 URL Configuration
+"""test2 URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.0/topics/http/urls/
@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+
 from django.contrib import admin
 from django.urls import include, path
 
@@ -26,7 +28,7 @@ urlpatterns = [
 
 # 访问http://127.0.0.1:8000/index网页的步骤如下：
 # 1.浏览器访问网址，django会自动提取地址后面的 index
-# 2.index 先到项目下的test1/urls中的urlpatterns中依次匹配
+# 2.index 先到项目下的test2/urls中的urlpatterns中依次匹配
 # 3.r''可以匹配任何内容，然后进booktest.urls中继续匹配
 # 4.url(r'^index', views.index)匹配成功，然后调用的是视图views.index方法
 # 5.返回index方法的结果，将内容显示在网页上

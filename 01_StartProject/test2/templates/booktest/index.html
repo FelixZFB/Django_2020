@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有图书信息</title>
+</head>
+<body>
+    <div>
+        <!--地址/前面会默认补全http://127.0.0.1:8000-->
+        <!--跳转完整地址：http://127.0.0.1:8000/create-->
+        <a href="/create">新增</a>
+    </div>
+    <div>图书信息如下：</div>
+    {#遍历图书列表#}
+    {%for book in books%}
+        <!--{#注释内容#}也可以作为注释图书天龙八部的连接：http://127.0.0.1:8000/book/1-->
+        {#输出图书名称，并设置超链接，链接地址是一个数字，即图书的id#}
+        <li>
+            <a href="/books/{{book.id}}">{{book.btitle}}</a>
+            <a href="/detele/{{book.id}}">删除</a>
+        </li>
+    {%endfor%}
+</body>
+</html>
