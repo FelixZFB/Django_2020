@@ -2,7 +2,7 @@
 
 ### 网站参考
 - [Django官网](https://www.djangoproject.com/)
-- [Django中文网 2.0中文教程](https://www.django.cn/course/course-1.html)
+- [Django中文网 2.0中文入门教程](https://www.django.cn/course/course-1.html)
 - [Django 教程 菜鸟教程](https://www.runoob.com/django/django-tutorial.html)
 - [Django 教程 W3CSchool](https://www.w3cschool.cn/django/)
 
@@ -359,16 +359,17 @@
     - T全拼为Template：模板，负责封装构造要返回的html。
 
 - 具体步骤：
-    - 包括三个方面，三个方面顺序不分先后。
-    - 1.定义视图views.py
+    - MVT完成包括三个方面，三个方面顺序不分先后:
+    - 1.定义模型models.py
+    - 2.定义视图views.py
         - show_books函数：查询数据库，返回所有图书信息，然后调用模板，然后展示出来
         - detail函数：
             - 点击图书连接,连接里面包含图书的id，展示图书及英雄信息。
             - 图书id作为参数传给detail函数，然后获取图书关联的英雄信息
             - 返回信息，调用模板，然后展示出来
             - 正则表达式中的分组会自动作为参数传给视图中的函数
-    - 2.定义URLconf, 应用booktest下的urls，项目test1下的urls上面3.4节中已经配置了
-    - 3.定义模板文件
+        - 定义URLconf, 应用booktest下的urls，项目test1下的urls上面3.4节中已经配置了
+    - 3.定义模板文件，主要是html文件
 
 - 运行：
     - 启动服务器：python manage.py runserver
@@ -377,7 +378,7 @@
         - http://127.0.0.1:8000/books/1
         - http://127.0.0.1:8000/books/2
 
-# 4 模型（Model）
+# 4 Django 使用 MySQL 数据库实例
 ## 4.1 Django 中的 ORM
 - ORM，全拼Object-Relation Mapping，中文意为对象-关系映射，是随着面向对象的软件开发方法发展而产生的。
 - 在MVC框架中的Model模块中都包括ORM，对于开发人员主要带来了如下好处：
@@ -490,7 +491,7 @@
     - 1.本地化设置
     - 2.创建管理员
     - 3.注册模型
-    - 4.自定义展示后台
+    - 4.自定义展示后台内容
 - 启动django服务器进入后台
     - python manage.py runserver
     - http://127.0.0.1:8000/admin
@@ -523,5 +524,95 @@
     - 图书列表展示_图书详情展示_新增图书_删除图书执行效果如下：
     ![图书列表展示_图书详情展示_新增图书_删除图书](99_Django笔记图片/022_图书列表展示_图书详情展示_新增图书_删除图书.png)     
   
-    
-  
+
+## 5 模型(M)深入
+## 5.1 定义属性
+- Django根据属性的类型确定以下信息：
+    - 当前选择的数据库支持字段的类型
+    - 渲染管理表单时使用的默认html控件
+    - 在管理站点最低限度的验证
+
+- django会为表创建自动增长的主键列，每个模型只能有一个主键列，如果使用选项设置某属性为主键列后django不会再创建自动增长的主键列    
+- 默认创建的主键列属性为id，可以使用pk代替，pk全拼为primary key。
+    - 注意：pk是主键的别名，若主键名为id2，那么pk是id2的别名。
+
+- 属性命名限制：
+    - 不能是python的保留关键字。
+    - 不允许使用连续的下划线(间断的单下划线可以)，这是由django的查询方式决定的，在第4节会详细讲解查询。
+    - 定义属性时需要指定字段类型，通过字段类型的参数指定选项，语法如下：
+
+- 属性 = models.字段类型(选项)
+    - 比如以下模型属性：
+        - hname = models.CharField(max_length=20)
+        - hgender = models.BooleanField()
+        - bpub_date = models.DateField()
+
+## 5.2 字段类型
+- 属性 = models.字段类型(选项)
+- 使用时需要引入django.db.models包，字段类型如下：
+    - 常用类型：
+    - BooleanField：布尔字段，值为True或False。用于性别。
+    - CharField(max_length=字符长度)：字符串。
+        - 参数max_length表示最大字符个数。
+        - 必须有长度参数
+    - IntegerField：整数。
+    - DateField[auto_now=False, auto_now_add=False])：日期(年月日)。
+        - 参数auto_now表示每次保存对象时，自动设置该字段为当前时间，用于"最后一次修改"的时间戳，它总是使用当前日期，默认为false。
+            - auto_now=True，表示属性的值使用更新的时间，自动修改为更新的时间
+        - 参数auto_now_add表示当对象第一次被创建时自动设置当前时间，用于创建的时间戳，它总是使用当前日期，默认为false。
+            - auto_now_add=True 表示属性的值使用创建的时间
+        - 参数auto_now_add和auto_now是相互排斥的，组合将会发生错误。
+        - 一般不用指定参数，两个要指定True时候只能指定一个，不然会产生冲突。
+        - 频繁修改情况可以使用auto_now=True
+    - TimeField：时间(时分秒)，参数同DateField。
+    - DateTimeField：日期时间(年月日时分秒)，参数同DateField。  
+    - FileField：上传文件字段。
+    - ImageField：继承于FileField，对上传的内容进行校验，确保是有效的图片。
+    - DecimalField(max_digits=None, decimal_places=None)：十进制浮点数。
+        - 参数max_digits表示总位数。
+        - 参数decimal_places表示小数位数。
+        - 用于表示价格等精准数字
+    - FloatField：浮点数。
+        - 常用数字，参数同上  
+        
+    - 不常用类型：
+    - AutoField：自动增长的IntegerField，通常不用指定，不指定时Django会自动创建属性名为id的自动增长属性。
+    - NullBooleanField：支持Null、True、False三种值。
+    - TextField：大文本字段，一般超过4000个字符时使用。
+        
+## 5.3 选项
+- 属性 = models.字段类型(选项)
+- 通过选项实现对字段的约束，选项如下：
+    - null：如果为True，表示允许为空，默认值是False。
+    - blank：如果为True，则该字段允许为空白，默认值是False。
+        - 用于Django后台管理，添加内容时候某个属性设置为blank时候，后台表单选择时候可以不写内容。
+        - 对比：null是数据库范畴的概念，blank是表单验证范畴的。
+    - db_column：字段的名称（相当于给属性的数据库中重命名），如果未指定，则使用属性的名称。一般不指定。
+    - db_index：若值为True, 则在表中会为此字段创建索引，默认值是False。
+    - default：默认值。
+    - primary_key：若为True，则该字段会成为模型的主键字段，默认值是False，一般作为AutoField的选项使用。
+    - unique：如果为True, 这个字段在表中必须有唯一值，默认值是False。
+    - 注意：选项如果修改后，需要重新生成迁移文件并执行迁移命令
+
+- 使用示例：
+```python
+from django.db import models
+
+#定义图书模型类BookInfo
+class BookInfo(models.Model):
+    #btitle = models.CharField(max_length=20)#图书名称
+    btitle = models.CharField（max_length=20, db_column='title')#通过db_column指定btitle对应表格中字段的名字为title
+    bpub_date = models.DateField()#发布日期
+    bread = models.IntegerField(default=0)#阅读量
+    bcomment = models.IntegerField(default=0)#评论量
+    isDelete = models.BooleanField(default=False)#逻辑删除
+
+#定义英雄模型类HeroInfo
+class HeroInfo(models.Model):
+    hname = models.CharField(max_length=20)#英雄姓名
+    hgender = models.BooleanField(default=True)#英雄性别
+    isDelete = models.BooleanField(default=False)#逻辑删除
+    #hcomment = models.CharField(max_length=200)#英雄描述信息
+    hcomment = models.CharField(max_length=200, null=True, blank=False) #hcomment对应的数据库中的字段可以为空，但通过后台管理页面添加英雄信息时hcomment对应的输入框不能为空
+    hbook = models.ForeignKey('BookInfo')#英雄与图书表的关系为一对多，所以属性定义在英雄模型类中
+```   
