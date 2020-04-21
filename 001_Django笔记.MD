@@ -620,14 +620,267 @@ class HeroInfo(models.Model):
 ```   
 
 ## 5.4 字段查询
-- M(Model)模型实现sql中where的功能，调用过滤器filter()、exclude()、get()，下面以filter()为例。
+- M(Model)模型实现sql中where语句的功能，调用过滤器filter()、exclude()、get()，下面以filter()为例。
 - 通过"属性名_id"表示外键对应对象的id值。
 - 语法如下：
     - 属性名称__比较运算符=值
     - list=BookInfo.objects.filter(id=1)
+    - SQL语法如下：
+        - select * from 表名 where 条件;
+        - select * from students where id=1;
     - 说明：属性名称和比较运算符间使用两个下划线，所以前面定义属性名称时候不能包括多个下划线。
     - id__exact=1
-    - id=1 （上面的简写）
+    - id=1 （exact表示判等，可以简写）
     - btitle__contains='传'
     - btitle__endswith='部'
+
+- Django查询步骤：
+    - 激活虚拟环境，切换到项目文件夹下，现有以test2为例，切换到/01_StartProject/test2下
+    - 运行django调试端：python manage.py shell
+    - 导入模型类，查询一个模型实例对象，然后就可以通过实例直接查看相关属性的值
+    ```
+    >>> from booktest.models import BookInfo
+    >>> b = BookInfo.objects.get(id=1)
+    >>> print(b)
+    BookInfo object (1)
+    >>> print(b.btitle)
+    射雕英雄传
+    >>> books = BookInfo.objects.all()
+    >>> type(books)
+    <class 'django.db.models.query.QuerySet'>
+    >>> print(books)
+    <QuerySet [<BookInfo: BookInfo object (1)>, <BookInfo: BookInfo object (2)>, <BookInfo: BookInfo object (3)>, <BookInfo: BookInfo object (4)>, <BookInfo: BookInfo object (7)>, <BookInfo: BookInfo object (11)>, <BookInfo: BookInfo object (12)>, <BookInfo: BookInfo object (13)>]>
+    >>> b1 = BookInfo.objects.filter(btitle__contains='传')
+    >>> print(b1)
+    <QuerySet [<BookInfo: BookInfo object (1)>]>
+    >>> print(b1.btitle)
+    Traceback (most recent call last):
+      File "<console>", line 1, in <module>
+    AttributeError: 'QuerySet' object has no attribute 'btitle'
+    >>> type(b1)
+    <class 'django.db.models.query.QuerySet'>
+    >>>  
+    ```
+    - 如果查询的对象不存在，会报出DoesNotExist的错误
+
+## 5.5 查询函数
+- get	
+    - 返回表中满足条件的一条且只能有一条数据。	
+    - 返回值是一个模型类对象。可以直接用句点法查看对象属性
+    - 参数中写查询条件。
+        - 1)如果查到多条数据，则抛异常MultipleObjectsReturned。
+        - 2)查询不到数据，则抛异常：DoesNotExist。
+- all	
+    - 返回模型类对应表格中的所有数据。	
+    - 返回值是QuerySet类型，查询集。集合类型。
+    - 参数写查询条件。
+    - 查询表的all，all可以省略
+        - list = BookInfo.objects.count()
+        - list = BookInfo.objects.all().count()
+        - print(list)
+        - 8
+- filter(最常用)	
+    - 返回满足条件的数据。	
+    - 返回值是QuerySet类型，查询集。
+    - 参数写查询条件。
+- exclude	
+    - 返回不满足条件的数据。	
+    - 返回值是QuerySet类型，查询集。
+    - 参数写查询条件。
+- order_by	
+    - 对查询结果进行排序。	
+    - 返回值是QuerySet类型，查询集。
+    - 参数中写根据哪些字段进行排序。
+    - 默认升序，
+
+## 5.6 条件查询(属性和常量比较)
+- 1) 查询等
+    - exact：表示判等。
+    - 例：查询编号为1的图书。
+    - list=BookInfo.objects.filter(id__exact=1)
+    - 可简写为：
+    - list=BookInfo.objects.filter(id=1)
+    - 结果是一个QuerySet集合类型，list只是为了方便，并不是列表，而是一个集合列表
+    - 查看上面Django查询步骤里面的查询结果
+
+- 2) 模糊查询
+    - contains：是否包含。
+    - 说明：如果要包含%无需转义，直接写即可。
+    - 例：查询书名包含'传'的图书。
+    - list = BookInfo.objects.filter(btitle__contains='传')
+    - startswith、endswith：以指定值开头或结尾。
+    - 例：查询书名以'部'结尾的图书
+    - list = BookInfo.objects.filter(btitle__endswith='部')
+    - 以上运算符都区分大小写，在这些运算符前加上i表示不区分大小写，如iexact、icontains、istartswith、iendswith.
+
+- 3) 空查询
+    - isnull：是否为null。
+    - 例：查询书名不为空的图书。
+    - list = BookInfo.objects.filter(btitle__isnull=False)
+    - 等同于SQL语句：
+    - select * from booktest_bookinfo where btitle is not null;
+
+- 4) 范围查询
+    - in：是否包含在范围内。
+    - 例：查询编号为1或3或5的图书
+    - list = BookInfo.objects.filter(id__in=[1, 3, 5])
+
+- 5) 比较查询
+    - gt、gte、lt、lte：大于、大于等于、小于、小于等于。
+    - 例：查询编号大于3的图书
+    - list = BookInfo.objects.filter(id__gt=3)
+    - 不等于的运算符，使用exclude()过滤器。
+    - 例：查询编号不等于3的图书
+    - list = BookInfo.objects.exclude(id=3)
+
+- 6) 日期查询
+    - year、month、day、week_day、hour、minute、second：对日期时间类型的属性进行运算。
+    - 例：查询1980年发表的图书。
+    - list = BookInfo.objects.filter(bpub_date__year=1980)
+    - 例：查询1980年1月1日后发表的图书。
+    - list = BookInfo.objects.filter(bpub_date__gt=date(1990, 1, 1))
+
+## 5.7 F对象查询(类属性之间比较)
+- F对象：之前的查询都是对象的属性与常量值比较，两个属性的值怎么比较呢？
+- 答：使用F对象，被定义在django.db.models中。
+- 语法如下：
+    - F(属性名)
+- 例：查询阅读量大于等于评论量的图书。
+    - from django.db.models import F
+    - list = BookInfo.objects.filter(bread__gte=F('bcomment'))
+    - 可以在F对象上使用算数运算。
+    - 例：查询阅读量大于2倍评论量的图书。
+    - list = BookInfo.objects.filter(bread__gt=F('bcomment') * 2)
+- 注意：
+    - 使用前要先导入F对象
+
+## 5.8 Q对象查询(多个条件查询)
+- 多个过滤器逐个调用表示逻辑与关系，同sql语句中where部分的and关键字。
+- 例：查询阅读量大于20，并且编号小于3的图书。
+    - list=BookInfo.objects.filter(bread__gt=20,id__lt=3)
+    - 或list=BookInfo.objects.filter(bread__gt=20).filter(id__lt=3)
+- 如果需要实现逻辑或or的查询，必须使用Q()对象结合|运算符，Q对象被义在django.db.models中。
+    - 语法如下：
+    - Q(属性名__运算符=值)
+    - 例：查询阅读量大于20的图书，改写为Q对象如下。
+        - from django.db.models import Q
+        - list = BookInfo.objects.filter(Q(bread__gt=20))
+- Q对象可以使用&、|连接，&表示逻辑与，|表示逻辑或。
+    - 例：查询阅读量大于20，或编号小于3的图书，只能使用Q对象实现
+        - list = BookInfo.objects.filter(Q(bread__gt=20) | Q(pk__lt=3))
+    - Q对象前可以使用~操作符，表示非not。
+    - 例：查询编号不等于3的图书。
+        - list = BookInfo.objects.filter(~Q(pk=3))
+- 注意：
+    - 使用时候需要先导入Q对象
+    - 查询与，直接使用上面的传多个参数，写法更简洁，或的话就需要使用Q对象  
+    ```
+    >>> b2 = BookInfo.objects.filter(bread__gt=20).filter(id__lt=3)
+    >>> print(b2)
+    <QuerySet [<BookInfo: BookInfo object (2)>]>
+    >>> b3 = BookInfo.objects.filter(Q(bread__gt=20) | Q(pk__lt=3))
+    Traceback (most recent call last):
+      File "<console>", line 1, in <module>
+    NameError: name 'Q' is not defined
+    >>> from django.db.models import Q
+    >>> b3 = BookInfo.objects.filter(Q(bread__gt=20) | Q(pk__lt=3))
+    >>> print(b3)
+    <QuerySet [<BookInfo: BookInfo object (1)>, <BookInfo: BookInfo object (2)>, <BookInfo: BookInfo object (4)>]>
+    >>>
+    ```
+
+## 5.9 aggregate()聚合函数(返回函数的值)
+- 使用aggregate()过滤器调用聚合函数。聚合函数包括：Avg，Count，Max，Min，Sum，被定义在django.db.models中。
+    - 例：查询所有图书的总阅读量。
+        - from django.db.models import Sum
+        - list = BookInfo.objects.aggregate(Sum('bread'))
+    - 注意aggregate的返回值是一个字典类型，格式如下：
+        - {'聚合类小写__属性名':值}
+        - 如:{'sum__bread':3}
+
+- 使用count时一般不使用aggregate()过滤器。
+    - 例：查询图书总数。
+        - BookInfo.objects.all().count()
+        - BookInfo.objects.count()
+    - 例：统计id大于等于3的所有图书的数量
+        - BooInfo.objects.filter(id__gt=3).count()
+        - 先条件查询得到查询集，然后统计查询集中对象的数量
+    - 注意count函数的返回值是一个数字。
+
+## 5.10 查询集
+- 前面将的查询可以一次性导入所有：    
+    - from django.db.models import F,Q,Sum,Count,Avg,Max,Min
+    - 查询返回结果是一个QuerySet查询集对象，就可以继续调用上面所有的查询函数，在结果里面继续查询
+
+- 查询集是什么？    
+    - 查询集表示从数据库中获取的对象集合，在管理器上调用某些过滤器方法会返回查询集，
+    - 查询集可以含有零个、一个或多个过滤器。过滤器基于所给的参数限制查询的结果，
+    - 从Sql的角度，查询集和select语句等价，过滤器像where和limit子句。
+    - 例：查询编号大于3的图书
+    - list = BookInfo.objects.filter(id__gt=3) 
+    - 查询结果list就是一个QuerySet查询集
+
+- 返回查询集的过滤器如下：
+    - all()：返回所有数据。
+    - filter()：返回满足条件的数据。
+    - exclude()：返回满足条件之外的数据，相当于sql语句中where部分的not关键字。
+    - order_by()：对结果进行排序。
+
+- 返回单个值的过滤器如下：
+    - get()：返回单个满足条件的对象
+        - 如果未找到会引发"模型类.DoesNotExist"异常。
+        - 如果多条被返回，会引发"模型类.MultipleObjectsReturned"异常。
+    - count()：返回当前查询结果的总条数，结果是一个数字
+    - aggregate()：聚合，返回一个字典。
+
+- 判断某一个查询集中是否有数据：
+    - exists()：判断查询集中是否有数据，如果有则返回True，没有则返回False。
+    - 例：查询编号大于3的图书
+    - list = BookInfo.objects.filter(id__gt=3)  
+    - list.exists()
+    - True 有数据  
     
+- 查询集两大特性
+    - 惰性执行：创建查询集不会访问数据库，直到调用数据时，才会访问数据库，调用数据的情况包括迭代、序列化、与if合用。
+    - 缓存：使用同一个查询集，第一次使用时会发生数据库的查询，然后把结果缓存下来，再次使用这个查询集时会使用缓存的数据。
+        - 例：
+        - 惰性执行：
+            - list = BookInfo.objects.filter(id__gt=3)
+            - 返回查询集list, 并没有访问mysql数据库，只是相当于创建了一条sql查询语句
+            - list
+            - 调用查询集对象，此时访问数据库，返回查询结果
+            - [<BookInfo: BookInfo object (3)>, <BookInfo: BookInfo object (4)>, <BookInfo: BookInfo object (7)>]
+        - 缓存：
+            - [x fox x in list]
+            - [<BookInfo: BookInfo object (3)>, <BookInfo: BookInfo object (4)>, <BookInfo: BookInfo object (7)>]
+            - 上面第一次调用for循环，会发生数据库查询
+            - 再次调用for循环，直接取出缓存中的结果，不访问数据库
+
+- 限制查询集
+    - 查询集可以进行类似列表切片操作，可以对查询集进行取下标或切片操作
+        - list = BookInfo.objects.filter(id__gt=3)
+        - list1 = list[0:3]
+    - 注意：
+        - 下标和切片操作不能使用负值
+        - 对查询集进行切片后返回一个新的查询集，不会立即执行查询
+    - 使用负索引：   
+        - list2 = list[0:-2] 会报错
+    - 取出查询集的第一个数据,下面两种方式：
+        - list[0]
+        - list[0:1].get()
+        - 但是如果没有数据，[0]引发IndexError异常，[0:1].get()如果没有数据引发DoesNotExist异常。
+
+- 查询集的缓存 
+    - 每个查询集都包含一个缓存来最小化对数据库的访问。
+    - 在新建的查询集中，缓存为空，首次对查询集求值时，会发生数据库查询，
+    - django会将查询的结果存在查询集的缓存中，并返回请求的结果，接下来对查询集求值将重用缓存中的结果          
+    
+    - 情况一：如下是两个查询集，无法重用缓存，每次查询都会与数据库进行一次交互，增加了数据库的负载。
+        - from booktest.models import BookInfo
+        - [book.id for book in BookInfo.objects.all()]
+        - [book.id for book in BookInfo.objects.all()]
+    - 情况二：经过存储后，可以重用查询集，第二次使用缓存中的数据。
+        - list=BookInfo.objects.all()
+        - [book.id for book in list]
+        - [book.id for book in list]
+    - 推荐使用方式2，先返回一个查询集对象，然后再继续操作查询集
