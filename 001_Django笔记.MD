@@ -159,7 +159,9 @@
     - 1.在models.py中定义模型类
     - 2.迁移
     - 3.通过类和对象完成数据增删改查操作
- 
+
+- 通过模型类进行MySQL数据库的增删改查，面向数据库编程转变成面向对象编程
+    - 实际底部是面向对象增删改查通过django的ORM框架转换为mysql语句
      
 ## 3.2 模型类实例 (models.py)
 - 注意：所有命令要终端要切换到项目文件夹/test1下下执行
@@ -601,7 +603,7 @@ from django.db import models
 #定义图书模型类BookInfo
 class BookInfo(models.Model):
     #btitle = models.CharField(max_length=20)#图书名称
-    btitle = models.CharField（max_length=20, db_column='title')#通过db_column指定btitle对应表格中字段的名字为title
+    btitle = models.CharField(max_length=20, db_column='title')#通过db_column指定btitle对应表格中字段的名字为title
     bpub_date = models.DateField()#发布日期
     bread = models.IntegerField(default=0)#阅读量
     bcomment = models.IntegerField(default=0)#评论量
@@ -616,3 +618,16 @@ class HeroInfo(models.Model):
     hcomment = models.CharField(max_length=200, null=True, blank=False) #hcomment对应的数据库中的字段可以为空，但通过后台管理页面添加英雄信息时hcomment对应的输入框不能为空
     hbook = models.ForeignKey('BookInfo')#英雄与图书表的关系为一对多，所以属性定义在英雄模型类中
 ```   
+
+## 5.4 字段查询
+- M(Model)模型实现sql中where的功能，调用过滤器filter()、exclude()、get()，下面以filter()为例。
+- 通过"属性名_id"表示外键对应对象的id值。
+- 语法如下：
+    - 属性名称__比较运算符=值
+    - list=BookInfo.objects.filter(id=1)
+    - 说明：属性名称和比较运算符间使用两个下划线，所以前面定义属性名称时候不能包括多个下划线。
+    - id__exact=1
+    - id=1 （上面的简写）
+    - btitle__contains='传'
+    - btitle__endswith='部'
+    
