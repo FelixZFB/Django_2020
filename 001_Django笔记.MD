@@ -527,7 +527,7 @@
     ![图书列表展示_图书详情展示_新增图书_删除图书](99_Django笔记图片/022_图书列表展示_图书详情展示_新增图书_删除图书.png)     
   
 
-## 5 模型(M)深入
+## 5 模型(Model)深入
 ## 5.1 定义属性
 - Django根据属性的类型确定以下信息：
     - 当前选择的数据库支持字段的类型
@@ -1049,12 +1049,83 @@ class AreaInfo(models.Model):
     - <class 'django.db.models.manager.Manager'>
     
     - 自定义Manager()对象，为模型类BookInfo定义管理器books语法如下：
-        - class BookInfo(models.Model):
+        - class BookInfo(models.Model): # models.Model 模型类
         - .......
-        - books = models.Manager()
+        - objects1 = models.Manager() # 模型管理器类
         - 自定义管理器之后Django不再帮我们生成默认的objects管理器。
-        - BookInfo.objects.all() 会报错没有objects对象
-        - BookInfo.books.all()  此时要将objects换成自定义的对象
-        
-        
-- 管理器Manager
+        - BookInfo.objects.all() 会报错没有objects对象，因为objects已经被重写为objects1了
+        - BookInfo.objects1.all()  此时要将objects换成自定义的对象
+
+- 模型类和模型管理器类关系如下图，它们通过模型管理器实例对象建立联系
+![模型类_模型管理器类](99_Django笔记图片/027_模型类_模型管理器类_通过模型管理器对象建立联系.png)             
+              
+- 自定义管理器类主要用于两种情况：
+    - 1.修改原始查询集，重写all()方法
+    - 2.向管理器类中添加额外的方法，如向数据库中插入数据。
+    - 注意：创建模型类对象self.model可以自动获得模型类的名称
+    - 查看01_StartProject/test2/booktest/models.py里面的代码
+    
+    ```python
+    from django.db import models
+    # 自定义管理器类,继承django内部的models.Manager
+    class BookInfoManager(models.Manager):
+        '''图书模型管理器类'''
+        # 1.自定义all方法，修改原始查询集，重写all()方法
+        # 默认查询未删除的图书信息
+        # 调用父类的成员语法为：super().方法名
+        # BookInfo.objects1.all()
+        def all(self):
+            return super().all().filter(isDelete=False)
+    
+        # 2. 在管理器类中定义创建对象的方法
+        # 创建模型类，接收参数为属性赋值
+        # 自定义一个创建一个图书对象的方法
+        # BookInfo.objects1.create_book("abc",date(1980,1,1))
+        def create_book(self, title, pub_date):
+            # 创建模型类对象self.model可以自动获得模型类的名称，所以图书类名称变化也可以自动获取
+            book = self.model() # book = BookInfo
+            book.btitle = title
+            book.bpub_date = pub_date
+            book.bread = 0
+            book.bcommet = 0
+            book.isDelete = False
+            # 将数据插入进数据表
+            book.save()
+            return book
+          
+        # 定义元选项
+        # 在模型类中定义类Meta，用于设置元信息，如使用db_table自定义表的名字。
+        # 数据表的默认名称为：
+        # appname_modelname
+        # booktest_bookinfo
+        # class Meta:
+            # db_table='bookinfo' 
+            # 指定BookInfo默认生成的数据表名为bookinfo
+            # 相当于使用bookinfo替换默认的名称booktest_bookinfo
+            # 好处：即使应用名称改变对表名也没有影响
+    
+  
+    # 定义图书模型类BookInfo
+    class BookInfo(models.Model):
+        btitle = models.CharField(max_length=20) # 图书名称
+        bpub_date = models.DateField() # 发布日期
+        bread = models.IntegerField(default=0) # 阅读量
+        bcomment = models.IntegerField(default=0) # 评论量
+        isDelete = models.BooleanField(default=False) # 逻辑删除
+    
+        # 自定义管理器,本来objects是Django帮我自动生成的管理器对象，objects是models.Manger类的一个对象
+        # objects = models.Manager()  objects1 = BookInfoManager() = models.Manager()
+        # 实际使用中，自定义objects后的名称还是使用objects，除了重写自定义的方法，其它方法还是继承自models.Manager()
+        # 此处自定义一个objects1实际所有功能和默认的objects是相同的
+        objects1 = BookInfoManager()
+    ```
+- Meta元选项
+    - 一种定义元选项Meta 
+    - 用于指定表名
+    - 数据表的默认名称为：
+    - appname_modelname
+    - 参考上面代码中的Meta部分代码及说明 
+    
+
+## 6 视图(View)深入
+## 5.1 定义属性    
