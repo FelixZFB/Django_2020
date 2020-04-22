@@ -884,3 +884,177 @@ class HeroInfo(models.Model):
         - [book.id for book in list]
         - [book.id for book in list]
     - 推荐使用方式2，先返回一个查询集对象，然后再继续操作查询集
+
+## 5.11 模型类关系
+- 关系字段类型
+    - 关系型数据库的关系包括三种类型：
+    - ForeignKey：一对多，将字段定义在多的一端中。
+        - 比如一本图书有多个英雄，字段定义在英雄类里面。
+    - ManyToManyField：多对多，将字段定义在任意一端中。
+        - 一个新闻类和新闻类型类，一个新闻类型下可以用很多条新闻，一条新闻也可能归属于多种新闻类型。
+    - OneToOneField：一对一，将字段定义在任意一端中。
+        - 员工基本信息类（姓名）-员工详细信息类(住址，员工工号，岗位等等）
+    - 可以维护递归的关联关系，使用'self'指定，详见"自关联"。
+    - 注意：关系型字段
+
+- 一对多关联（常用，重点）：
+    - 一个英雄即属于英雄类，又属于图书类
+    - 一对多使用ForeignKey，定义在英雄类中
+    - hbook就是一对多的关联属性，图书和英雄都有默认的id属性
+    - 指定的属性是hbook，实际表中生成的属性是hbook_id，即关联的图书的id
+    - sql写入数据时候，可以指定hbook_id的值，即关联图书的id值（id是默认的属性），参考021图片向数据库写入数据hbook指定的对应字段就是hbook_id
+    - django后台管理添加英雄信息，hbook的值是直接在选框里面选择图书的名称即可，自动关联了图书的id
+    ![图书表及英雄表结构](99_Django笔记图片/025_图书表及英雄表结构.png)
+    ```python
+    #定义图书模型类BookInfo
+    class BookInfo(models.Model):
+        btitle = models.CharField(max_length=20)#图书名称
+        bpub_date = models.DateField()#发布日期
+        bread = models.IntegerField(default=0)#阅读量
+        bcomment = models.IntegerField(default=0)#评论量
+        isDelete = models.BooleanField(default=False)#逻辑删除
+    
+    #定义英雄模型类HeroInfo
+    class HeroInfo(models.Model):
+        hname = models.CharField(max_length=20)#英雄姓名
+        hgender = models.BooleanField(default=True)#英雄性别
+        isDelete = models.BooleanField(default=False)#逻辑删除
+        hcomment = models.CharField(max_length=200)#英雄描述信息
+        # BookInfo类和HeroInfo类之间具有一对多的关系，这个一对多的关系应该定义在多的那个类，也就是HeroInfo类中
+        # 注意设置外键时候django1.8版本以后需要on_delete参数，不然会错误
+        hbook = models.ForeignKey('BookInfo', on_delete=models.CASCADE) # 让BookInfo类和HeroInfo类之间建立了一对多的关系
+    ```
+    
+- 多对多
+    - 我们下面设计一个新闻类和新闻类型类，
+    - 一个新闻类型下可以用很多条新闻，一条新闻也可能归属于多种新闻类型。
+    ```python
+    class TypeInfo(models.Model):
+      tname = models.CharField(max_length=20) #新闻类别
+      # 多对多关系，通过ManyToManyField建立TypeInfo类和NewsInfo类之间多对多的关系
+      # ttype = models.ManyToManyField('NewsInfo', on_delete=models.CASCADE) 
+    
+    class NewsInfo(models.Model):
+      ntitle = models.CharField(max_length=60) #新闻标题
+      ncontent = models.TextField() #新闻内容
+      npub_date = models.DateTimeField(auto_now_add=True) #新闻发布时间
+      # 多对多关系，通过ManyToManyField建立TypeInfo类和NewsInfo类之间多对多的关系
+      # 定义在任何一端里面都可以
+      ntype = models.ManyToManyField('TypeInfo', on_delete=models.CASCADE) 
+    ```
+
+- 一对一
+    - 员工基本信息类（姓名）-员工详细信息类(住址，员工工号，岗位等等）
+    ![一对一关系](99_Django笔记图片/023_关系型字段_一对一关系.png)
+
+## 5.12 关联查询
+- 通过对象执行关联查询
+    - 在一对多关系中，一对应的类我们把它叫做一类，多对应的那个类我们把它叫做多类，
+    - 我们把多类中定义的建立关联的类属性叫做关联属性。
+    - 例：查询id为1的图书关联的英雄的信息。
+        - b = BookInfo.objects.get(id=1) # 先建立图书对象
+        - b.heroinfo_set.all() # 图书对象查询所有英雄，注意格式
+        - 通过模型类查询：
+        - HeroInfo.objects.filter(hbook__id=1) # hbook是关联属性，关联图书的id=1
+    
+    - 例：查询id为1的英雄关联的图书信息。
+        - h = HeroInfo.objects.get(id=1) # 先建立英雄对象
+        - h.hbook # 英雄对象查询所属的图书
+        - 通过模型类查询：
+        - BookInfo.objects.filter(heroinfo__id=1) # heroinfo__id=1表示英雄的id为1的英雄对象
+        - 注意结果区分：
+            - 第一种对象查询，对象.属性，返回结果就是一个对象，即图书的名称
+            - 第二种模型类，使用filter，返回结果是一个查询集，赋值给list对象，然后下标取出第一个对象
+            - 取出查询集的第一个数据,下面两种方式：
+                - list[0]
+                - list[0:1].get()
+    ![一对一关系](99_Django笔记图片/024_关联查询_一查多_多查一.png)
+
+- 通过模型类执行关联查询
+    - 1.要查询哪个表中的数据，就通过哪个类来查，由该类开始，该类大写
+    - 2.写关联查询条件时候，如果类中没有关联属性，条件先写查询的类名(小写)，然后接着写该类中的属性和查询条件.比如例1，例2
+    - 3.有关联属性，查询参数里面直接写关联属性，然后写关联类中的属性和查询条件，比如例3
+    - 下面实例：BookInfo中没有关联属性，HeroInfo中有关联属性
+        - 例1：查询图书信息，要求图书关联的英雄的描述包含'八'。
+            - BookInfo.objects.filter(heroinfo__hcomment__contains='八')
+        - 例2：查询图书信息，要求图书中的英雄的id大于3.
+            - BookInfo.objects.filter(heroinfo__id__gt=3)
+        - 例3：查询书名为“天龙八部”的所有英雄。
+            - HeroInfo.objects.filter(hbook__btitle='天龙八部')
+
+    - 由一类的对象查询多类的时候(图书查英雄):
+        - 语法如下：
+        - 关联模型类名小写__属性名__条件运算符=值
+        - 如果没有"__运算符"部分，表示等于，结果和sql中的inner join相同。
+        - 例：查询图书，要求图书中英雄的描述包含'八'。
+            - list = BookInfo.objects.filter(heroinfo__hcontent__contains='八')
+        - 注意：要查询什么就写什么类名的大写，查询参数要写查询的类名小写
+    
+    - 由多类的对象查询一类的时候(英雄查图书): 
+        - 语法如下：
+        - 一模型类关联属性名__一模型类属性名__条件运算符=值
+        - 例：查询书名为“天龙八部”的所有英雄。
+            - list = HeroInfo.objects.filter(hbook__btitle='天龙八部')
+        - 一样是要查询英雄，最先大写英雄类名，里面写关联属性名称即hbook,然后图书的名称
+
+- 关联查询总结：
+    - 关联查询可以使用对象查询或模型类查询，推荐使用模型类关联查询
+    - 查询要领，牢记以下三点即可：
+        - 1.要查询哪个表中的数据，就通过哪个类来查，由该类开始，该类大写
+        - 2.写关联查询条件时候，如果类中没有关联属性，条件先写查询的类名(小写)，然后接着写该类中的属性和查询条件.比如上面例1，例2
+        - 3.有关联属性，查询参数里面直接写关联属性，然后写关联类中的属性和查询条件，比如上面例3
+    
+## 5.13 插入、更新和删除
+- 调用一个模型类对象的save方法的时候就可以实现对模型类对应数据表的插入和更新。
+- 调用一个模型类对象的delete方法的时候就可以实现对模型类对应数据表数据的删除。
+- 例：
+    - b = BookInfo.objects.get(id=1) # 创建对象
+    - b.title = “天龙八部”  # 赋值属性
+    - b.save() # 存储，写入或更新属性
+    - b.delete() # 删除对象
+    - 具体可以查看下面图片：
+    ![数据操作_查询修改数据](99_Django笔记图片/011_sqlite3数据操作_查询修改数据.png)
+    
+## 5.14 自关联
+- 对于地区信息、分类信息等数据，表结构非常类似，每个表的数据量十分有限，
+- 为了充分利用数据表的大量数据存储功能，可以设计成一张表，内部的关系字段指向本表的主键，这就是自关联的表结构
+- 比如下图，省表，市表，县表都做成一张地区表
+![自关联表结构](99_Django笔记图片/026_自关联表结构.png)
+- 自关联是一种特殊的一对多的关系。
+    - 案例：显示广州市的上级地区和下级地区。
+    - 地区表：id, atitle, aParent_id;
+
+```python
+from django.db import models
+class AreaInfo(models.Model):
+    '''地区模型类'''
+    # 地区名称
+    atitle = models.CharField(max_length=20)
+    # 关系属性，代表当前地区所属的父级地区, 可以为null,可以为空
+    # self，自关联，一种特殊的一对多
+    aParent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+```   
+
+## 5.15  模型类实例对象方法
+- str()：在将对象转换成字符串时会被调用。
+- save()：将模型对象保存到数据表中，ORM框架会转换成对应的insert或update语句。
+- delete()：将模型对象从数据表中删除，ORM框架会转换成对应的delete语句。
+
+## 5.16 模型类的属性
+- 属性objects：管理器，是models.Manager类型的对象，用于与数据库进行交互。
+    - BookInfo.objects.all()->objects是一个什么东西呢？
+    - 答：objects是Django帮我自动生成的管理器对象，通过这个管理器可以用于与数据库进行交互。
+    - objects是models.Manger类的一个对象。自定义管理器之后Django不再帮我们生成默认的objects管理器。
+    - type(BookInfo.objects)
+    - <class 'django.db.models.manager.Manager'>
+    
+    - 自定义Manager()对象，为模型类BookInfo定义管理器books语法如下：
+        - class BookInfo(models.Model):
+        - .......
+        - books = models.Manager()
+        - 自定义管理器之后Django不再帮我们生成默认的objects管理器。
+        - BookInfo.objects.all() 会报错没有objects对象
+        - BookInfo.books.all()  此时要将objects换成自定义的对象
+        
+        
+- 管理器Manager

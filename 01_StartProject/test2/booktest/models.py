@@ -20,3 +20,6 @@ class HeroInfo(models.Model):
     # BookInfo类和HeroInfo类之间具有一对多的关系，这个一对多的关系应该定义在多的那个类，也就是HeroInfo类中
     # 注意设置外键时候django1.8版本以后需要on_delete参数，不然会错误
     hbook = models.ForeignKey('BookInfo', on_delete=models.CASCADE) # 英雄与图书表的关系为一对多，所以属性定义在英雄模型类中
+
+# 自定义管理器类
+class BookInfoManager(models.Manager)
