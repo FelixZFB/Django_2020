@@ -74,6 +74,8 @@ WSGI_APPLICATION = 'test2.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# django默认sqlite3轻量化数据库
+# 自定义使用mysql数据库，使用前要先启动数据库服务
 DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆页面</title>
+</head>
+<body>
+    <div>
+        提交的两种方式<br/>
+        POST:提交的数据在请求头中，FormData中。数据安全性高用POST<br/>
+        GET:提交的数据在url中,一般数据使用GET即可<br/>
+    </div>
+    <form method="post" action="/login_check">{% csrf_token %}
+        用户名：<input type="text" name="username"><br/>
+        密码：<input type="password" name="password"><br/>
+        <input type="submit" value="登录">
+    </form>
+
+</body>
+</html>

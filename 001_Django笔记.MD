@@ -92,7 +92,7 @@
         ![MVC框架各部分功能](99_Django笔记图片/003_Django_MVT各部分的功能.png)
  
         
-# 2 创建一个项目
+# 2 创建一个入门项目 (test1项目)
 ## 2.1 创建 Django 项目
 - 虚拟环境下，进入 01_StartProject 目录下执行创建项目命令：
     - django-admin startproject test1   
@@ -286,7 +286,10 @@
         - 该名称是有/booktest/models.py中的__str__方法决定的
         - 我们可以修改该方法，让后台显示对象的名称，查看models.py
         - 注意：admin.py中设置对象展示方式后该方法自动忽略
-
+- 注意：
+    - 1、后台管理超级账户admin，同一个虚拟环境只需要创建一次即可？
+    - 2、还是同一个站点http://127.0.0.1:8000/admin/只需创建一次即可以共用？
+    - test2项目创建后，test3未创建，可以直接使用该账号登陆
 
 ## 3.4 视图 (views.py) 
 - 访问http://127.0.0.1:8000/admin/ 进入后台管理界面
@@ -312,6 +315,11 @@
         - 注意点：
             - urls文件，django2.0以前路径是使用的url，后面版本都使用path
             - 正则表达式需要严格匹配url地址的开头和结尾
+        - URL匹配说明：
+            - http://127.0.0.1:8000/index?a=1&b=2&c=3
+            - 视图函数url匹配时候：/之前的http://127.0.0.1:8000是主域名不参加匹配
+            - ?后面的是参数，是传给后台的参数，也不参加匹配
+            - 实际视图中查找匹配的url只有/ ?之间的index
     ![配置视图函数1](99_Django笔记图片/013_url配置视图函数返回结果1.png) 
     ![url地址匹配不到的报错情况](99_Django笔记图片/014_url地址匹配不到的报错情况_包含url匹配时候查找顺序.png) 
 
@@ -380,7 +388,7 @@
         - http://127.0.0.1:8000/books/1
         - http://127.0.0.1:8000/books/2
 
-# 4 Django 使用 MySQL 数据库实例
+# 4 Django 使用 MySQL 数据库实例 (test2项目)
 ## 4.1 Django 中的 ORM
 - ORM，全拼Object-Relation Mapping，中文意为对象-关系映射，是随着面向对象的软件开发方法发展而产生的。
 - 在MVC框架中的Model模块中都包括ORM，对于开发人员主要带来了如下好处：
@@ -444,11 +452,14 @@
         - /test2/\__init\__.py文件中配置pymsql，加入以下两句代码：
             - import pymysql
             - pymysql.install_as_MySQLdb()
+    - 注意：django2.2以后使用mysqlclient包，参考下面
+            
         
 - 4. 启动服务器：
 - 运行：
     - 启动服务器：python manage.py runserver
     - http://127.0.0.1:8000
+    - 注意：启动django之前要启动mysql服务器
     
 - 版本兼容性问题：
     - 注意上面mysql配置对于django2.2之前版本没有问题，但是2.2之后会报错：
@@ -466,7 +477,7 @@
         - 导入的包不同
         - mysqlclient创建连接比pymysql前面多加一个MySQLdb
         - 就是创建连接时候有点区别，其它操作都一样
-        - 具体参考下图：
+        - 具体参考下面对比图：
         ![pymysql和mysqlclient操作mysql数据库对比](99_Django笔记图片/019_pymysql和mysqlclient操作mysql数据库对比.png) 
         - 博文参考：[通过mysqlclient操作MySQL数据库]()
 
@@ -1128,4 +1139,183 @@ class AreaInfo(models.Model):
     
 
 ## 6 视图(View)深入
-## 5.1 定义属性    
+- 视图就是python中的函数，视图一般被定义在"应用/views.py"文件中，此例中为"booktest/views.py"文件。
+- 视图必须返回一个HttpResponse对象或子对象作为响应。
+- 响应可以是一张网页的HTML内容，一个重定向，一个404错误等。
+
+- 视图的第一个参数必须为HttpRequest实例(一般就是写的request)，还可能包含下参数如：
+    - 通过正则表达式组获得的关键字参数。
+    - 通过正则表达式组获取的位置参数。
+
+## 6.1 创建一个 test3 项目
+- 下面所有文件夹路径都是以项目/test3开始 
+- 1.创建项目：
+    - 激活虚拟环境，进入02_test3文件夹下，执行创建项目命令：
+    - django-admin startproject test3
+- 2.创建应用：
+    - 进入到test3文件夹，执行创建应用命令：
+    - python manage.py startapp booktest
+    - 创建过程及项目结构如下：    
+    ![test3项目及应用创建](99_Django笔记图片/028_test3项目及应用创建.png)  
+- 3.在test3/settings.py中INSTALLED_APPS项安装注册应用 
+    - 'booktest',   
+- 4.在test3/settings.py中TEMPLATES项配置模板查找路径。     
+    - 先在test3项目下创建模板文件夹templates
+    - 进入templates文件夹创建booktest文件夹
+    - 然后settings.py配置模板路径：
+    - 'DIRS': [os.path.join(BASE_DIR, 'templates')],
+- 5.配置mysql数据库，在test3/settings.py中DATABASES项配置使用MySQL数据库
+    - 数据库直接使用test2项目，即 4.2 节已经创建好的django_test2数据库
+    - settings.py中DATABASES参数进行数据库配置,具体查看settings.py文件
+    - 注意：启动django之前要启动mysql服务器
+
+## 6.2 使用视图(view)过程
+- 视图就是一个python函数，被定义在"应用/views.py"文件中。 使用视图时需要进行两方面操作，两个操作不分先后。
+- 1.定义booktest/views.py视图函数
+    - 首先一般定义一个index函数
+- 2.配置URLconf，将视图函数和url对应起来
+    - 配置项目urls文件，test3/urls.py，文件中添加以下代码
+    ```python
+    from django.contrib import admin
+    from django.urls import include, path
+    
+    urlpatterns = [
+        path('admin/', admin.site.urls), # 配置项目，默认的后台管理请求
+        path(r'', include('booktest.urls')), # 包含booktest应用下的urls文件
+    ]
+    ```
+    - 配置应用urls文件，booktest/urls.py，文件中添加以下代码
+    ```python
+    from django.conf.urls import url  #导入url函数
+    from booktest import views        #导入视图模块
+    urlpatterns = [
+        url(r'^index$', views.index), # 建立url和视图函数的联系
+    ]
+    ```
+
+- 此时可以启动服务器：
+    - 切换到test3文件夹下，启动服务器：python manage.py runserver
+    - http://127.0.0.1:8000 (访问该网址提示找不着页面404错误，我们已经进行了实际开发，直接访问下面页面)  
+    - http://127.0.0.1:8000/index   # 访问首页
+    - http://127.0.0.1:8000/admin   # 访问后台
+    - 注意：启动django之前要启动mysql服务器(一个新的终端启动：mysql -u root -p)
+    
+## 6.3 错误视图
+- Django内置处理HTTP错误的视图，主要错误及视图包括：
+    - 404错误：page not found视图  比如上面http://127.0.0.1:8000打开就是返回的404错误
+    - 500错误：server error视图
+
+- 如果想看到错误视图而不是调试信息(页面显示出了后台url匹配过程，如下图所示)，需要修改test3/setting.py文件的DEBUG项。
+    - DEBUG = False  # 网站开发使用True
+    - ALLOWED_HOSTS = ['*', ]   # False时候必须设置允许地址
+    - * 表示允许所有用户访问
+    - 实际开发debug为True，才能显示具体的错误，错误出现在什么位置
+    ![404错误_显示调试详细信息](99_Django笔记图片/029_404错误_显示调试详细信息.png)
+
+- 404错误及视图
+    - 将请求地址进行url匹配后，没有找到匹配的正则表达式，则调用404视图，
+    - 这个视图会调用404.html的模板进行渲染。
+    - 视图传递变量request_path给模板，表示导致错误的URL。
+    - 404默认错误：
+        - Not Found
+        - The requested resource was not found on this server.
+    - 404自定义的错误页面配置：
+        - 在templates文件夹中创建404.html
+        - 自定义要显示的内容，传递变量request_path给模板
+        - request_path，即请求的地址
+        - 页面找不到，django会自动调用模板中的404.html
+        
+- 500错误及视图
+    - 在视图中代码运行报错会发生500错误，调用内置错误视图，使用templates/500.html模板渲染。        
+    - 默认5050错误页面显示：Server Error(500)
+
+- 视图处理URL请求的过程
+![视图处理URL请求的过程](99_Django笔记图片/030_视图处理URL请求的过程.png)
+
+## 6.4 捕获URL参数
+- 进行url匹配时，把所需要的捕获的部分设置成一个正则表达式组，
+- 这样django框架就会自动把匹配成功后相应组的内容作为参数传递给视图函数。
+    - 位置参数，参数名可以随意指定
+        - url(r'^delete(\d+)/$',views.show_arg)
+        - (\d+)这个当做一个参数传给视图中的show_arg函数的参数
+        - def show_arg(request, id):
+        - return HttpResponse('show arg %s'%id)
+        - 多个参数，按位置进行传递
+    - 关键字参数：在位置参数的基础上给正则表达式组命名即可。
+        - ?P<组名>
+        - 关键字参数，视图中函数的参数名必须和正则表达式组名一致，比如下面都是id1
+        - url(r'^delete(?P<id1>\d+)/$',views.show_arg)
+        - def show_arg(request, id1):
+        - return HttpResponse('show %s'%id1)
+    - 注意：两种参数的方式不要混合使用，在一个正则表达式中只能使用一种参数方式
+
+- 具体查看views.py中show_arg函数，urls中要进行配置
+    - 访问：http://127.0.0.1:8000/delete222/
+    - 页面结果：show arg 222
+
+## 6.5 HttpReqeust对象
+- 服务器接收到http协议的请求后，会根据报文创建HttpRequest对象，
+- 这个对象不需要我们创建，直接使用服务器构造好的对象就可以。
+- 视图的第一个参数必须是HttpRequest对象，在django.http模块中定义了HttpRequest对象的API。
+
+- 视图中的def index(request)
+    - request就是一个HttpReqeust对象
+    - request对象就包含了请求的信息
+    - MiniWeb框架使用WSGI接口，里面的请求信息时放在application函数的env参数中
+    - env是一个字典类型，里面用于存储请求的信息，比如请求的网址
+    - Django框架封装了WSGI接口，相当于request对象就包含env
+    - 具体参考下面图：
+    ![MiniWeb框架_WSGI接口](99_Django笔记图片/031_MiniWeb框架_WSGI接口.png)
+    ![Django框架已经实现了WSGI接口的封装](99_Django笔记图片/032_Django框架已经实现了WSGI接口的封装.png)
+    
+- HttpReqeust对象的属性
+    - 下面除非特别说明，属性都是只读的。
+    - path：一个字符串，表示请求的页面的完整路径，不包含域名和参数部分。
+    - method：一个字符串，表示请求使用的HTTP方法，常用值包括：'GET'、'POST'。
+        - 在浏览器中给出地址发出请求采用get方式，如超链接。
+        - 在浏览器中点击表单的提交按钮发起请求，如果表单的method设置为post则为post请求。
+    - encoding：一个字符串，表示提交的数据的编码方式。
+        - 如果为None则表示使用浏览器的默认设置，一般为utf-8。
+        - 这个属性是可写的，可以通过修改它来修改访问表单数据使用的编码，接下来对属性的任何访问将使用新的encoding值。
+    - GET：QueryDict类型对象，类似于字典，包含get请求方式的所有参数。
+    - POST：QueryDict类型对象，类似于字典，包含post请求方式的所有参数。
+    - FILES：一个类似于字典的对象，包含所有的上传文件。
+    - COOKIES：一个标准的Python字典，包含所有的cookie，键和值都为字符串。
+    - session：一个既可读又可写的类似于字典的对象，表示当前的会话，只有当Django 启用会话的支持时才可用，详细内容见"状态保持"。   
+    
+## 6.6 登陆页面案例
+- 提交数据的两种方式
+    - POST:提交的数据在请求头中，FormData中。数据安全性高用POST
+        - 请求头中的Form Data:
+        - username: "xiashu"
+        - password: "123456"
+    - GET:提交的数据在url中,一般数据使用GET即可
+        - 请求数据直接在网址中
+        - http://127.0.0.1:8000/login_check?username=xiashu&password=123456
+        - ?后面就是参数，使用=和&符号分开
+    - 查看booktest/views.py 中的login和login_check
+        
+- request.POST属性：QueryDict类型对象，类似于字典，包含post请求方式的所有参数
+- request.GET属性：QueryDict类型对象，类似于字典，包含get请求方式的所有参数。
+- 它们的类型：<class 'django.http.request.QueryDict'>，可以使用键取出值
+
+- QueryDict使用：
+    - 存入值：
+        - q = QueryDict('a=1&b=2&c=3')
+    - 取出值：
+        - q['a']
+        - 1
+        - q.get('b')
+        - 2
+    - QueryDict与字典区别，一个键可以设置多个值，但是字典键值是唯一的
+        - q = QueryDict('a=1&a=2&a=3&b=4')
+        - q['a'] 或者 q.get('a')
+        - 3  默认返回最后一个值
+        - q.getlist('a')
+        - ['1', '2', '3']
+        
+- 登陆报错解决：
+    - 报错内容：CSRF token missing or incorrect
+    - 确认settings中的MIDDLEWARE里面有：'django.middleware.csrf.CsrfViewMiddleware'
+    - form表单后面加上后面这句即可：{% csrf_token %}
+    - <form method="post" action="/login_check">{% csrf_token %}

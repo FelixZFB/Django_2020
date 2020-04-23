@@ -39,7 +39,7 @@ urlpatterns = [
 # 因此我们需要严格匹配，匹配字符串开头^到结尾$,保证一致性
 
 # 访问http://127.0.0.1:8000/index网页的步骤如下：
-# 1.浏览器访问网址，django会自动提取地址后面的 index
+# 1.浏览器访问网址，django会自动提取地址/后面的 index
 # 2.index 先到项目下的test2/urls中的urlpatterns中依次匹配
 # 3.r''可以匹配任何内容，然后进booktest.urls中继续匹配
 # 4.url(r'^index', views.index)匹配成功，然后调用的是视图views.index方法
