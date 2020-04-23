@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax登陆页面</title>
+    <script src="/static/js/jquery-1.12.4.js"></script>
+    <script>
+        $(function () {
+            // 绑定btnAjax的click事件
+            $('#btnLogin').click(function () {
+                alert(1);
+                $.ajax({
+                    'url': '/ajax_handle',
+                    'type': 'get',
+                    'datatype': 'json',
+                    // 异步执行，$.ajax不会等回调函数执行完毕，后面代码会继续执行，弹出1，然后弹出3，最后弹出2
+                    // 'async': false, // ajax默认是异步的，此处false表示同步，一步一步向下执行
+                }).success(function (data) {
+                    // 进行处理请求
+                    // alert(data.res);
+                    alert(2);
+                    if (data.res == 1){
+                        $('#message').show().html('登陆成功')
+                    }
+                });
+                alert(3)
+            })
+        })
+
+    </script>
+    <style>
+        #message {
+            display: none;
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        提交的两种方式<br/>
+        POST:提交的数据在请求头中，FormData中。数据安全性高用POST<br/>
+        GET:提交的数据在url中,一般数据使用GET即可<br/>
+    </div>
+    <div>
+        用户名：<input type="text" name="username"><br/>
+        密码：<input type="password" name="password"><br/>
+        <input type="button" id="btnLogin" value="登录">
+    </div>
+    <div id="message"></div>
+</body>
+</html>

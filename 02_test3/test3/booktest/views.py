@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 # Create your views here.
 
@@ -36,3 +36,20 @@ def login_check(request):
 
     # 3.返回结果
     # return HttpResponse('OK')
+
+
+# http://127.0.0.1:8000/ajax_test
+def ajax_test(request):
+    '''显示test_ajax.html页面'''
+    return render(request, 'booktest/ajax_test.html')
+
+def ajax_handle(request):
+    '''ajax请求的具体处理'''
+    # 返回的json数据，字典形式，返回时候会自动转换为json格式数据
+    return JsonResponse({'res': 1})
+
+
+# http://127.0.0.1:8000/ajax_login
+def login_ajax(request):
+    '''显示ajax登陆页面'''
+    return render(request, 'booktest/login_ajax.html')

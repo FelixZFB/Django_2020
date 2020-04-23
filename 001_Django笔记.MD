@@ -1293,7 +1293,6 @@ class AreaInfo(models.Model):
         - 请求数据直接在网址中
         - http://127.0.0.1:8000/login_check?username=xiashu&password=123456
         - ?后面就是参数，使用=和&符号分开
-    - 查看booktest/views.py 中的login和login_check
         
 - request.POST属性：QueryDict类型对象，类似于字典，包含post请求方式的所有参数
 - request.GET属性：QueryDict类型对象，类似于字典，包含get请求方式的所有参数。
@@ -1319,3 +1318,35 @@ class AreaInfo(models.Model):
     - 确认settings中的MIDDLEWARE里面有：'django.middleware.csrf.CsrfViewMiddleware'
     - form表单后面加上后面这句即可：{% csrf_token %}
     - <form method="post" action="/login_check">{% csrf_token %}
+    
+- 登陆案例详情查看：
+    - booktest/views.py 中的login和login_check
+    - 密码正确，跳转到首页
+    - 密码不对，刷新页面
+    - 但是存在一个问题，如果登陆页面资源过多，重新加载页面消耗资源太多
+    - 解决方法：ajax异步加载，对页面进行局部刷新 
+
+## 6.7 static 静态文件配置
+- settings中配置静态文件夹路径
+    - STATIC_URL = '/static/'
+    - STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件的保存目录
+- test3文件夹下创建静态文件夹
+    - static
+    - static里面分别创建三个文件夹：css js images
+    
+   
+## 6.8 ajax异步请求登录案例
+- ajax使用：
+    - 查看templates/ajax_test.html和views文件
+    - 1)发起ajax请求：jquery发起
+    - 2)执行相应的视图函数，返回json内容
+    - 3)执行相应的回调函数。通过判断json内容，进行相应处理。
+    ![ajax请求过程](99_Django笔记图片/033_ajax请求过程.png)
+- ajax请求过程都是在后台完成，前端页面不会有任何变化
+    - 具体过程进network中查看
+    - 进具体ajax请求的response中查看详细信息
+
+- ajax登陆案例
+    - 6.6 节普通表单提交登陆升级为ajax局部请求登录
+
+    

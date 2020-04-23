@@ -30,6 +30,9 @@ urlpatterns = [
     url(r'^delete(\d+)/$',views.show_arg), # 捕获url参数，展示捕获的参数
     url(r'^login$',views.login), # 显示登录界面
     url(r'^login_check$',views.login_check), # 用户校验
+    url(r'^ajax_test$',views.ajax_test), # 显示ajax测试页面
+    url(r'^ajax_handle$',views.ajax_handle), # 处理ajax测试页面的ajax请求
+    url(r'^login_ajax$',views.login_ajax), # 显示ajax登陆页面
 ]
 
 

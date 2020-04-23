@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax使用</title>
+    <script src="/static/js/jquery-1.12.4.js"></script>
+    <script>
+        $(function () {
+            // 绑定btnAjax的click事件
+            $('#btnAjax').click(function () {
+                alert(1);
+                $.ajax({
+                    'url': '/ajax_handle',
+                    'type': 'get',
+                    'datatype': 'json',
+                    // 异步执行，$.ajax不会等回调函数执行完毕，后面代码会继续执行，弹出1，然后弹出3，最后弹出2
+                    // 'async': false, // ajax默认是异步的，此处false表示同步，一步一步向下执行
+                }).success(function (data) {
+                    // 进行处理请求
+                    // alert(data.res);
+                    alert(2);
+                    if (data.res == 1){
+                        $('#message').show().html('登陆成功')
+                    }
+                });
+                alert(3)
+            })
+        })
+
+    </script>
+    <style>
+        #message {
+            display: none;
+            color: red;
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+    <input type="button" id="btnAjax" value="ajax请求">
+    <div id="message"></div>
+</body>
+</html>
