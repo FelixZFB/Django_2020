@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
+from datetime import datetime, timedelta
 
 # Create your views here.
 
@@ -43,11 +44,11 @@ def ajax_test(request):
     '''显示test_ajax.html页面'''
     return render(request, 'booktest/ajax_test.html')
 
+# http://127.0.0.1:8000/ajax_handle
 def ajax_handle(request):
     '''ajax请求的具体处理'''
     # 返回的json数据，字典形式，返回时候会自动转换为json格式数据
     return JsonResponse({'res': 1})
-
 
 # http://127.0.0.1:8000/ajax_login
 def login_ajax(request):
@@ -68,5 +69,22 @@ def login_ajax_check(request):
         # 用户名密码错误，返回json格式数据
         return JsonResponse({'res': 0})
 
+# 服务器设置cookie演示
+# http://127.0.0.1:8000/set_cookie
+def set_cookie(request):
+    '''设置cookie信息'''
+    response = HttpResponse('<h1>服务器设置Cookie成功，请查看响应报文头cookie信息</h1>')
+    # 设置一个cookie信息，名字为num,值为1
+    # max_age=14*24*3600设置过期时间为14天，单位是秒
+    # expires设置过期时间，当前时间加上14天
+    response.set_cookie('num', 1, expires=datetime.now()+timedelta(days=14))
+    # 返回response
+    return response
 
-
+# 浏览器获取cookie信息演示
+# http://127.0.0.1:8000/get_cookie
+def get_cookie(request):
+    '''取出cookie信息'''
+    # 取出cookie信息num的值
+    num = request.COOKIES.get('num')
+    return HttpResponse('<h1>浏览器获取Cookie成功，请查看响应报文头cookie信息。Cookie的值是：%s</h1>' % num)

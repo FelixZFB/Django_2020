@@ -34,6 +34,8 @@ urlpatterns = [
     url(r'^ajax_handle$',views.ajax_handle), # 处理ajax测试页面的ajax请求
     url(r'^login_ajax$',views.login_ajax), # 显示ajax登陆页面
     url(r'^login_ajax_check$',views.login_ajax_check), # ajax登陆用户密码校验
+    url(r'^set_cookie$',views.set_cookie), # 服务器设置cookie
+    url(r'^get_cookie$',views.get_cookie), # 浏览器获取cookie
 ]
 
 

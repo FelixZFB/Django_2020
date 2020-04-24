@@ -1479,4 +1479,22 @@ class AreaInfo(models.Model):
     - Cookie以键值对的格式进行信息的存储。
     - Cookie基于域名安全，不同域名的Cookie是不能互相访问的，如访问itcast.cn时向浏览器中写了Cookie信息，使用同一浏览器访问baidu.com时，无法访问到itcast.cn写的Cookie信息。
     - 当浏览器请求某网站时，会将浏览器存储的跟网站相关的所有Cookie信息提交给网站服务器。request.COOKIES。
-    - cookie是有过期时间的，如果不指定，默认关闭浏览器之后cookie就会过期。
+    - cookie是有过期时间的，如果不指定，默认关闭浏览器之后cookie就会过期。再次访问就没有携带cookie，访问失败。
+    - 典型应用：记住用户名，网站的广告推送。
+    ![cookie存储读取过程](99_Django笔记图片/035_浏览器和服务器cookie存储读取过程.png)
+    
+- Cookie示例
+    - 查看/booktest/views.py中的set_cookie和get_cookie函数
+    - cookie_set是浏览器设置cookie，
+    - 设置cookie后，浏览器本地就会保存了cookie，
+    - 此时访问该域名网址http://127.0.0.1:8000时候会自动携带服务器设置的cookie
+    - 我们依次访问：
+        - 设置cookie：http://127.0.0.1:8000/set_cookie
+            - 响应头里面就可以看见Set-Cookie字段
+            ![服务器设置cookie](99_Django笔记图片/036_服务器设置cookie.png)
+            ![服务器设置cookie](99_Django笔记图片/038_cookie值.png)
+            - 上图发现，cookie里面除了自己设置的num，还有csrftoken和sessionid是出于安全考虑浏览器自动生成的，后面会讲到
+        - 获取cookie：http://127.0.0.1:8000/get_cookie
+            - 取出cookie，请求头里面已经携带了上面设置的cookie信息了
+            ![浏览器获取cookie](99_Django笔记图片/037_浏览器获取cookie.png)
+        
