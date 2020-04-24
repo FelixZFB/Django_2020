@@ -339,16 +339,19 @@
 
 - 定义模板文件
     - templtes/booktest/index.html文件
-    - 在模板中输出变量语法如下，变量可能是从视图中传递过来的，也可能是在模板中定义的
+    - 在模板中输出变量语法如下，变量可能是从视图中函数以字典方式传递过来的，也可能是在模板中定义的
         - {{变量名}}
         - {{title}}
-    - 在模板中编写代码段语法如下：
+    - django框架在前端页面中的代码格式：
+        - 在模板中html文件中编写代码段语法如下：
         - {%代码段%}
         - {%for i in list%}
         - {{i}}<br>
         - {%endfor%}
         - 注意使用for循环代码后，末尾要写上结束代码
-    - 具体查看index.html文件和views.py视图文件
+    - 注释的格式：
+        - {#注释的具体内容#}
+    - 具体查看/test1/templates/booktest/index.html和detail.html文件和views.py视图文件
     
 - 视图调用模板
     - 1.找到模板
@@ -1337,7 +1340,7 @@ class AreaInfo(models.Model):
    
 ## 6.8 ajax异步请求登录案例
 - ajax使用：
-    - 查看templates/ajax_test.html和views文件
+    - 查看templates/ajax_test.html和/booktest/views.py中的ajax_test及ajax_handle函数
     - 1)发起ajax请求：jquery发起
     - 2)执行相应的视图函数，返回json内容
     - 3)执行相应的回调函数。通过判断json内容，进行相应处理。
@@ -1347,6 +1350,15 @@ class AreaInfo(models.Model):
     - 进具体ajax请求的response中查看详细信息
 
 - ajax登陆案例
+    - 查看templates/login_ajax.html和/booktest/views.py中的login_ajax及login_ajax_check函数
     - 6.6 节普通表单提交登陆升级为ajax局部请求登录
-
+    - 点击登录，查看网络，里面只请求了login_ajax_check网址，整个页面是没有刷新，请求了局部刷新
+    - ajax请求关键点：
+        - 1)首先分析出ajax请求地址时需要携带的参数。
+        - 2)视图函数处理完成之后，所返回的json格式的数据。
+    - 报错：
+        - 禁止访问 (403) CSRF验证失败. 请求被中断.
+        - Help  Reason given for failure:
+        - CSRF token missing or incorrect.
+    
     

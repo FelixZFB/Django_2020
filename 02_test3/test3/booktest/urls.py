@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^ajax_test$',views.ajax_test), # 显示ajax测试页面
     url(r'^ajax_handle$',views.ajax_handle), # 处理ajax测试页面的ajax请求
     url(r'^login_ajax$',views.login_ajax), # 显示ajax登陆页面
+    url(r'^login_ajax_check$',views.login_ajax_check), # ajax登陆用户密码校验
 ]
 
 

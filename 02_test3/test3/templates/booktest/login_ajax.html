@@ -8,22 +8,29 @@
         $(function () {
             // 绑定btnAjax的click事件
             $('#btnLogin').click(function () {
-                alert(1);
+                // 1.获取用户名和密码
+                username = $('#username').val();
+                password = $('#password').val();
+
+                // 2.发送post类型的ajax请求携带上用户名和密码，
+                // 请求的地址/login_ajax_check,提交数据，取回json结果
                 $.ajax({
-                    'url': '/ajax_handle',
-                    'type': 'get',
-                    'datatype': 'json',
-                    // 异步执行，$.ajax不会等回调函数执行完毕，后面代码会继续执行，弹出1，然后弹出3，最后弹出2
-                    // 'async': false, // ajax默认是异步的，此处false表示同步，一步一步向下执行
-                }).success(function (data) {
-                    // 进行处理请求
-                    // alert(data.res);
-                    alert(2);
-                    if (data.res == 1){
-                        $('#message').show().html('登陆成功')
+                    'url': '/login_ajax_check', // 请求数据地址，可以是一个文件路径，也可以是一个网址/index
+                    'type': 'post',  // 请求数据的方式
+                    'data': {'username': username, 'password': password}, // 携带的参数
+                    'datatype': 'json',  // 请求返回的数据形式
+                }).success(function (data) { // 回调函数，处理具体的业务，取出json数据
+                    // 登陆成功{'res': 1},登陆失败{'res': 0}
+                    if (data.res == 0){
+                        $('#message').show().html('用户名或密码错误')
                     }
+                    else {
+                        // 跳转到首页
+                        location.href = '/index'
+                    }
+
                 });
-                alert(3)
+
             })
         })
 
@@ -43,10 +50,11 @@
         GET:提交的数据在url中,一般数据使用GET即可<br/>
     </div>
     <div>
-        用户名：<input type="text" name="username"><br/>
-        密码：<input type="password" name="password"><br/>
+        用户名：<input type="text" id="username"><br/>
+        密码：<input type="password" id="password"><br/>
         <input type="button" id="btnLogin" value="登录">
     </div>
+    {% csrf_token %};
     <div id="message"></div>
 </body>
 </html>
