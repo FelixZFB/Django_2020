@@ -1260,6 +1260,7 @@ class AreaInfo(models.Model):
 - 服务器接收到http协议的请求后，会根据报文创建HttpRequest对象，
 - 这个对象不需要我们创建，直接使用服务器构造好的对象就可以。
 - 视图的第一个参数必须是HttpRequest对象，在django.http模块中定义了HttpRequest对象的API。
+- django中的HttpReqeust对象就是视图函数中的必须参数request
 
 - 视图中的def index(request)
     - request就是一个HttpReqeust对象
@@ -1285,8 +1286,55 @@ class AreaInfo(models.Model):
     - FILES：一个类似于字典的对象，包含所有的上传文件。
     - COOKIES：一个标准的Python字典，包含所有的cookie，键和值都为字符串。
     - session：一个既可读又可写的类似于字典的对象，表示当前的会话，只有当Django 启用会话的支持时才可用，详细内容见"状态保持"。   
-    
-## 6.6 登陆页面案例
+
+- HttpReqeust对象的方法
+    - get()
+    - getlist()
+    - 具体使用如下
+
+- QueryDict对象的使用：
+    - 存入值：
+        - q = QueryDict('a=1&b=2&c=3')
+    - 取出值：
+        - q['a']
+        - 1
+        - q.get('b')
+        - 2
+    - QueryDict与字典区别，一个键可以设置多个值，但是字典键值是唯一的
+        - q = QueryDict('a=1&a=2&a=3&b=4')
+        - q['a'] 或者 q.get('a')
+        - 3  默认返回最后一个值
+        - q.getlist('a')
+        - ['1', '2', '3']  
+ 
+## 6.6 GET属性和POST属性
+- GET属性
+    - 请求格式：在请求地址结尾使用?，之后以"键=值"的格式拼接，多个键值对之间以&连接。
+    - 网址如下
+        - http://www.itcast.cn/?a=10&b=20&c=python
+    - 其中的请求参数为：
+        - a=10&b=20&c=python
+    - 分析请求参数，键为'a'、'b'、'c'，值为'10'、'20'、'python'。
+    - 在Django中可以使用HttpRequest对象的GET属性获得get方式获取请求的参数。
+        - request.GET.get('a')
+        - request.GET.get('b')
+    - GET属性是一个QueryDict类型的对象，键和值都是字符串类型。
+    - 键是开发人员在编写代码时确定下来的。
+    - 值是根据数据生成的。
+
+- POST属性
+    - 使用form表单请求时，method方式为post则会发起post方式的请求，
+    - 需要使用HttpRequest对象的POST属性接收参数，POST属性是一个QueryDict类型的对象。
+    - 表单控件name属性的值作为键，value属性的值为值，构成键值对提交。
+        - 如果表单控件没有name属性则不提交。
+        - 对于checkbox控件，name属性的值相同为一组，被选中的项会被提交，出现一键多值的情况。
+        - 键是表单控件name属性的值，是由开发人员编写的。
+        - 值是用户填写(input框填写的)或选择的。
+        - 查看test3/templates/login.html文件，POST传入值
+        - 查看test3/booktest/views.py，POST属性取出值
+
+ 
+## 6.7 登陆页面案例
 - 提交数据的两种方式
     - POST:提交的数据在请求头中，FormData中。数据安全性高用POST
         - 请求头中的Form Data:
@@ -1300,22 +1348,9 @@ class AreaInfo(models.Model):
 - request.POST属性：QueryDict类型对象，类似于字典，包含post请求方式的所有参数
 - request.GET属性：QueryDict类型对象，类似于字典，包含get请求方式的所有参数。
 - 它们的类型：<class 'django.http.request.QueryDict'>，可以使用键取出值
-
-- QueryDict使用：
-    - 存入值：
-        - q = QueryDict('a=1&b=2&c=3')
-    - 取出值：
-        - q['a']
-        - 1
-        - q.get('b')
-        - 2
-    - QueryDict与字典区别，一个键可以设置多个值，但是字典键值是唯一的
-        - q = QueryDict('a=1&a=2&a=3&b=4')
-        - q['a'] 或者 q.get('a')
-        - 3  默认返回最后一个值
-        - q.getlist('a')
-        - ['1', '2', '3']
-        
+    - username = request.POST.get('username')  
+    - password = request.POST.get('password')
+     
 - 登陆报错解决：
     - 报错内容：CSRF token missing or incorrect
     - 确认settings中的MIDDLEWARE里面有：'django.middleware.csrf.CsrfViewMiddleware'
@@ -1329,7 +1364,7 @@ class AreaInfo(models.Model):
     - 但是存在一个问题，如果登陆页面资源过多，重新加载页面消耗资源太多
     - 解决方法：ajax异步加载，对页面进行局部刷新 
 
-## 6.7 static 静态文件配置
+## 6.8 static 静态文件配置
 - settings中配置静态文件夹路径
     - STATIC_URL = '/static/'
     - STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件的保存目录
@@ -1337,28 +1372,111 @@ class AreaInfo(models.Model):
     - static
     - static里面分别创建三个文件夹：css js images
     
-   
-## 6.8 ajax异步请求登录案例
+      
+## 6.9 ajax异步请求登录案例
 - ajax使用：
     - 查看templates/ajax_test.html和/booktest/views.py中的ajax_test及ajax_handle函数
     - 1)发起ajax请求：jquery发起
     - 2)执行相应的视图函数，返回json内容
     - 3)执行相应的回调函数。通过判断json内容，进行相应处理。
-    ![ajax请求过程](99_Django笔记图片/033_ajax请求过程.png)
+    ![ajax请求过程1](99_Django笔记图片/033_ajax请求过程.png)
+    ![ajax请求过程2](99_Django笔记图片/034——ajax请求执行过程.png)
 - ajax请求过程都是在后台完成，前端页面不会有任何变化
     - 具体过程进network中查看
     - 进具体ajax请求的response中查看详细信息
 
 - ajax登陆案例
-    - 查看templates/login_ajax.html和/booktest/views.py中的login_ajax及login_ajax_check函数
+    - 查看test3/templates/login_ajax.html和test3/booktest/views.py中的login_ajax及login_ajax_check函数
     - 6.6 节普通表单提交登陆升级为ajax局部请求登录
     - 点击登录，查看网络，里面只请求了login_ajax_check网址，整个页面是没有刷新，请求了局部刷新
     - ajax请求关键点：
         - 1)首先分析出ajax请求地址时需要携带的参数。
         - 2)视图函数处理完成之后，所返回的json格式的数据。
-    - 报错：
+    - 登陆报错：
         - 禁止访问 (403) CSRF验证失败. 请求被中断.
         - Help  Reason given for failure:
         - CSRF token missing or incorrect.
+  
     
+## 6.10  HttpResponse对象   
+- 视图在接收请求并处理后，必须返回HttpResponse对象或子对象
+- HttpResponse对象响应内容浏览器检查网络查看响应里面具体信息
+
+- HttpResponse对象属性
+    - content：表示返回的内容。
+    - charset：表示response采用的编码字符集，默认为utf-8。
+    - status_code：返回的HTTP响应状态码。
+    - content-type：指定返回数据的的MIME类型，默认为'text/html'。
+
+- HttpResponse对象方法
+    - \_init_：创建HttpResponse对象后完成返回内容的初始化。
+    - set_cookie：设置Cookie信息。
+        - set_cookie(key, value='', max_age=None, expires=None)
+    - cookie是网站以键值对格式存储在浏览器中的一段纯文本信息，用于实现用户跟踪。
+        - max_age是一个整数，表示在指定秒数后过期。
+        - expires是一个datetime或timedelta对象，会话将在这个指定的日期/时间过期。
+        - max_age与expires二选一。
+        - 如果不指定过期时间，在关闭浏览器时cookie会过期。
+    - delete_cookie(key)：删除指定的key的Cookie，如果key不存在则什么也不发生。
+    - write：向响应体中写数据。
+
+- 视图函数返回HttpResponse对象的几种情况：
+    - 1.直接HttpResponse返回数据
+        ```python
+        from django.http import HttpResponse, JsonResponse
+        def index2(request):
+            str='<h1>hello world</h1>'
+            return HttpResponse(str)
+        ```
+    - 2.调用模板简写函数render
+        ```python
+        from django.shortcuts import render
+        def index3(request):
+            return render(request, 'booktest/index.html', {'h1': 'hello'})
+        ```
+    - 3.重定向一个网址redirect
+        ```python
+        from django.shortcuts import render, redirect
+        def login_check(request):      
+            return redirect('/login')
+        ```
+    - 4.JsonResponse返回json格式的数据
+        ```python
+        from django.http import HttpResponse, JsonResponse
+        def ajax_handle(request):
+            return JsonResponse({'res': 1})
+        ```
+
+## 6.11 子类JsonResponse和子类HttpResponseRedirect  
+- 子类JsonResponse
+    - JsonResponse对象的content-type为'application/json'
+    - 在浏览器中使用javascript发起ajax请求时，返回json格式的数据，
+    - 此处以jquery的get()方法为例。
+    - 类JsonResponse继承自HttpResponse对象，被定义在django.http模块中，
+    - 创建对象时接收字典作为参数，返回给ajax请求中的data
+    - 查看test3/templates/login_ajax.html和test3/booktest/views.py中的login_ajax及login_ajax_check函数
+ 
+- 子类HttpResponseRedirect
+    - Django中提供了HttpResponseRedirect对象实现重定向功能，
+    - 这个类继承自HttpResponse，被定义在django.http模块中，返回的状态码为302 
+    - 在django.shortcuts模块中为重定向类提供了简写函数redirect
+    - 实际使用，使用简写redirect，查看6.10中示例3
     
+## 6.12 状态保持：Cookie和Session
+- 浏览器请求服务器是无状态的
+    - 无状态指一次用户请求时，浏览器、服务器无法知道之前这个用户做过什么，每次请求都是一次新的请求
+    - 根本原因是：浏览器与服务器是使用Socket套接字进行通信的，服务器将请求结果返回给浏览器之后，
+    - 会关闭当前的Socket连接，而且服务器也会在处理页面完毕之后销毁页面对象
+    
+- 有时需要保存下来用户浏览的状态，比如用户是否登录过，浏览过哪些商品等。 
+    - 实现状态保持主要有两种方式：
+        - 在客户端存储信息使用Cookie。
+        - 在服务器端存储信息使用Session
+        
+## 6.13 Cookie
+- Cookie是存储在浏览器中的一段纯文本信息，建议不要存储敏感信息如密码，因为电脑上的浏览器可能被其它人使用。
+- Cookie的特点
+    - Cookie以键值对的格式进行信息的存储。
+    - Cookie基于域名安全，不同域名的Cookie是不能互相访问的，如访问itcast.cn时向浏览器中写了Cookie信息，使用同一浏览器访问baidu.com时，无法访问到itcast.cn写的Cookie信息。
+    - 当浏览器请求某网站时，会将浏览器存储的跟网站相关的所有Cookie信息提交给网站服务器。request.COOKIES。
+    - cookie是有过期时间的，如果不指定，默认关闭浏览器之后cookie就会过期。
