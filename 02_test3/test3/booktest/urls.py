@@ -36,6 +36,8 @@ urlpatterns = [
     url(r'^login_ajax_check$',views.login_ajax_check), # ajax登陆用户密码校验
     url(r'^set_cookie$',views.set_cookie), # 服务器设置cookie
     url(r'^get_cookie$',views.get_cookie), # 浏览器获取cookie
+    url(r'^set_session$',views.set_session), # 服务器设置session
+    url(r'^get_session$',views.get_session), # 浏览器获取session
 ]
 
 

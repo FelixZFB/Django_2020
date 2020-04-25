@@ -346,6 +346,7 @@
         - 在模板中html文件中编写代码段语法如下：
         - {%代码段%}
         - {%for i in list%}
+        - {{代码中变量或者views视图传递过来的变量}}
         - {{i}}<br>
         - {%endfor%}
         - 注意使用for循环代码后，末尾要写上结束代码
@@ -541,7 +542,7 @@
     ![图书列表展示_图书详情展示_新增图书_删除图书](99_Django笔记图片/022_图书列表展示_图书详情展示_新增图书_删除图书.png)     
   
 
-## 5 模型(Model)深入
+# 5 模型(Model)深入
 ## 5.1 定义属性
 - Django根据属性的类型确定以下信息：
     - 当前选择的数据库支持字段的类型
@@ -1141,7 +1142,7 @@ class AreaInfo(models.Model):
     - 参考上面代码中的Meta部分代码及说明 
     
 
-## 6 视图(View)深入
+# 6 视图(View)深入
 - 视图就是python中的函数，视图一般被定义在"应用/views.py"文件中，此例中为"booktest/views.py"文件。
 - 视图必须返回一个HttpResponse对象或子对象作为响应。
 - 响应可以是一张网页的HTML内容，一个重定向，一个404错误等。
@@ -1472,6 +1473,15 @@ class AreaInfo(models.Model):
     - 实现状态保持主要有两种方式：
         - 在客户端存储信息使用Cookie。
         - 在服务器端存储信息使用Session
+- 应用场景：
+    - cookie:记住用户名。安全性要求不高。
+    - session:涉及到安全性要求比较高的数据。银行卡账户,密码。
+
+- 注意：
+    - 前提：只要一个域名设置过cookie或session
+    - 下次请求时候就会带上所有设置过的cookie
+    - 取出session时候，也可以取出所有设置过的session
+
         
 ## 6.13 Cookie
 - Cookie是存储在浏览器中的一段纯文本信息，建议不要存储敏感信息如密码，因为电脑上的浏览器可能被其它人使用。
@@ -1480,21 +1490,112 @@ class AreaInfo(models.Model):
     - Cookie基于域名安全，不同域名的Cookie是不能互相访问的，如访问itcast.cn时向浏览器中写了Cookie信息，使用同一浏览器访问baidu.com时，无法访问到itcast.cn写的Cookie信息。
     - 当浏览器请求某网站时，会将浏览器存储的跟网站相关的所有Cookie信息提交给网站服务器。request.COOKIES。
     - cookie是有过期时间的，如果不指定，默认关闭浏览器之后cookie就会过期。再次访问就没有携带cookie，访问失败。
+    - cookie:记住用户名。安全性要求不高。
     - 典型应用：记住用户名，网站的广告推送。
     ![cookie存储读取过程](99_Django笔记图片/035_浏览器和服务器cookie存储读取过程.png)
+
+- 设置及获取cookie：
+    - 设置cookie：
+        - response.set_cookie('username', username, max_age=7*24*3600)
+        - 第一个参数是键的名称，第二个参数是值，第三个参数是过期时间，单位秒
+        - 注意：cookie设置的值类型不管是什么，取出来后都是字符串
+    - 获取cookie：
+        - username = request.COOKIES.get('username')
     
-- Cookie示例
+- cookie设置及获取示例
     - 查看/booktest/views.py中的set_cookie和get_cookie函数
-    - cookie_set是浏览器设置cookie，
+    - views中的set_cookie函数是浏览器设置cookie，
     - 设置cookie后，浏览器本地就会保存了cookie，
     - 此时访问该域名网址http://127.0.0.1:8000时候会自动携带服务器设置的cookie
     - 我们依次访问：
         - 设置cookie：http://127.0.0.1:8000/set_cookie
             - 响应头里面就可以看见Set-Cookie字段
+            - 设置cookie时候设置过期时间有以下两种方式：
+                - max_age=14*24*3600设置过期时间为14天，单位是秒
+                - expires设置过期时间，当前时间加上14天
             ![服务器设置cookie](99_Django笔记图片/036_服务器设置cookie.png)
             ![服务器设置cookie](99_Django笔记图片/038_cookie值.png)
             - 上图发现，cookie里面除了自己设置的num，还有csrftoken和sessionid是出于安全考虑浏览器自动生成的，后面会讲到
         - 获取cookie：http://127.0.0.1:8000/get_cookie
-            - 取出cookie，请求头里面已经携带了上面设置的cookie信息了
+            - 取出cookie，请求上面网址时候请求头里面已经携带了上面设置的cookie信息了
             ![浏览器获取cookie](99_Django笔记图片/037_浏览器获取cookie.png)
+          
+## 6.14 Cookie记住用户名案例
+- 查看/booktest/views.py中的login和login_check函数及login.html
+    - login_check里面书写设置cookie的代码，用户名和密码正确，login.html添加记住用户名代码，
+    - 当第一次正确登陆后，就将用户名取出然后设置到cookie值中，保存到浏览器
+    - login中书写读取cookie值中的用户名，第一次登陆后，后面登陆时候用户名就会自动填写
+    - login.html中添加用户名input的值就是login函数字典传递过去的变量
+                 
+## 6.15 Session    
+- session:涉及到安全性要求比较高的数据。银行卡账户,密码。
+- session存储在服务器端。
+- session的特点：
+    - 1)session是以键值对进行存储的。
+    - 2)session依赖于cookie。唯一的标识码保存在cookie中sessionid中。请求时候通过携带sessionid去服务器查找。
+    - 3)session也是有过期时间，如果不指定，默认两周就会过期。
+    ![session存储读取过程](99_Django笔记图片/039_浏览器和服务器session存储读取过程.png)
+
+- 设置和获取session：
+    - 设置session键的值：
+        - request.session['username'] = 'smart'        
+    - 获取session键的值：
+        - username = request.session['username']
+    - 注意：session设置的值类型是什么，取出就是什么，设置数字，取出来还是int数字类型
+
+- session设置及获取示例
+    - 查看/booktest/views.py中的set_session和get_session函数
+    - views中的set_session函数服务器设置session  
+        - session设置后有个唯一的sessionid，数据是保存在django连接的mysql数据库里面
+        - 数据库里面有一个django_session,里面的表中就保存了session的详细数据，
+        -  http://127.0.0.1:8000/set_session访问一次就会进行更新一次
+        - 浏览器cookie里面有个响应和请求cookie里面就有sessionid数据
+        - 具体查看下图：
+        ![服务器设置session](99_Django笔记图片/040_服务器设置session.png)
+    - views中的get_session函数服务器获取session  
+        - 浏览器请求同一个域名时候，django会自动返回已经储存的session信息
+        - 具体从数据库取出session由django框架完成我们不需要关心
+        - 只需要通过request取出来所需要的信息即可
+        - 具体查看下图：
+        ![浏览器获取session](99_Django笔记图片/041_浏览器获取session.png)
         
+## 6.15 session对象及方法
+- django默认使用django配置的数据库保存session，具体更换数据库查看html版教程3.5.2
+- Session包括三个数据：键，值，过期时间
+- session依赖于cookie，从上面6.14可以看出：
+    - 所有请求者的Session都会存储在服务器中，服务器如何区分请求者和Session数据的对应关系呢？
+    - 答：在使用Session后，会在Cookie中存储一个sessionid的数据，每次请求时浏览器都会将这个数据发给服务器，服务器在接收到sessionid后，会根据这个值找出这个请求者的Session。
+    - 结果：如果想使用Session，浏览器必须支持Cookie，否则就无法使用Session了。
+    - 存储Session时，键与Cookie中的sessionid相同，值是开发人员设置的键值对信息，进行了base64编码，过期时间由开发人员设置。
+    
+- session对象及方法：
+    - 通过HttpRequest对象的session属性进行会话的读写操作。
+    - 1)以键值对的格式写session。
+        - request.session['键']=值
+    - 2)根据键读取值。
+        - request.session.get('键',默认值)
+        - request.session['键']
+    - 3)清除所有session，在存储中删除值部分。
+        - request.session.clear()
+    - 4)清除session数据，在存储中删除session的整条数据,表中的一行删除。
+        - request.session.flush()
+    - 5)删除session中的指定键及值，在存储中只删除某个键及对应的值。
+        - del request.session['键']
+    - 6)设置会话的超时时间，如果没有指定过期时间则两个星期后过期。
+        - request.session.set_expiry(value)
+        - 设置的是cookie中sessionid的过期时间
+        - 不设置，默认时间就是2周
+        - 如果value是一个整数，会话将在value秒没有活动后过期。
+        - 如果value为0，那么用户会话的Cookie将在用户的浏览器关闭时过期。
+        - 如果value为None，那么会话永不过期。
+
+## 6.16 cookie和session记住用户登陆状态(登陆一次下次访问直接自动跳转登陆后页面)
+- 6.14 Cookie记住用户名案例， 已经记住用户名了
+- 但是记住登陆状态，下次访问登录页自动登录跳转到登陆后页面，还需要session验证
+- 只需要读取session中是否有islogin即可
+    - 查看/booktest/views.py中的login和login_check函数及login.html
+    - login_check函数中设置session一个值islogin，用于记住用户已经登录过
+    - login函数检查session中是否有islogin值，有的话表示有登录信息，直接进行跳转到登录后显示的页面
+    - 此时访问：http://127.0.0.1:8000/login，需要登录
+    - 第二次方法，直接跳转到首页了，自动跳过登录了
+    
