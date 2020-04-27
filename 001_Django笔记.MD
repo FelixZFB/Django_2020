@@ -1449,7 +1449,7 @@ class AreaInfo(models.Model):
     - <form method="post" action="/login_check">{% csrf_token %}
     
 - 登陆案例详情查看：
-    - booktest/views.py 中的login和login_check
+    - test3/booktest/views.py 中的login和login_checky以及对应的html模板文件
     - 密码正确，跳转到首页
     - 密码不对，刷新页面
     - 但是存在一个问题，如果登陆页面资源过多，重新加载页面消耗资源太多
@@ -1928,5 +1928,27 @@ class AreaInfo(models.Model):
 
 - 模板硬编码中的字符串默认不会经过转义，如果需要转义，那需要手动进行转义。
     - 手动将上面的符号写成转义后的符号
+
+## 7.8 登陆用户案例(修改密码)
+- 查看test4/booktest/views.py中change_pwd、change_pwd_action函数和change_pwd.html
+
+- test3项目中登陆综合案例(已有用户名记录，记住登陆状态功能，保存cookie和session功能)升级，
+- 直接将test3中的模板文件和视图函数复制过来，修改urls.py配置即可
+- 将登陆后跳转到首页修改为跳转到修改密码页面：change_pwd.html
+- 修改密码页面，输入新密码，完成修改
+- 我们进浏览器选项安全里面清除浏览器cookie相关信息，然后重新重login开始登陆
+
+- 修改密码确认后，访问http://127.0.0.1:8000/change_pwd_action该网址会报错
+    - 禁止访问 (403) CSRF验证失败. 请求被中断.
+    - 初级解决方案，将settings中的该代码注释掉即可：
+    - 'django.middleware.csrf.CsrfViewMiddleware',
+    
+- 登陆加上是否已经登录判断，使用装饰器
+    - 实际开发中，修改密码页面需要登录后才能访问
+    - change_pwd函数需要加上验证用户是否已经登录的判断
+    - 因为有很多页面都要登陆后才能访问，直接访问就跳转首页
+    - 因此使用一个装饰器，实现判断登陆和未登录执行不同操作
+    - 具体查看views函数中最开头的login_required装饰器函数
+    - 浏览器选项，安全隐私，清楚cookie信息，然后再访问change_pwd.html就会跳转到login.html页面
 
 

@@ -31,6 +31,10 @@ urlpatterns = [
     url(r'^temp_tags$', views.temp_tags), # 模板标签使用
     url(r'^temp_inherit$', views.temp_inherit), # 模板继承
     url(r'^temp_escape$', views.temp_escape), # 模板转义
+    url(r'^login$',views.login), # 显示登录界面
+    url(r'^login_check$',views.login_check), # 用户校验
+    url(r'^change_pwd$',views.change_pwd), # 显示修改密码页面
+    url(r'^change_pwd_action$',views.change_pwd_action), # 修改密码处理
 ]
 
 
