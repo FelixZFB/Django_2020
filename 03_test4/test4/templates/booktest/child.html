@@ -1,0 +1,5 @@
+{% extends 'booktest/base.html' %}
+{% block b1 %}
+<h5>实际填充内容,下面一行是获取的父模板的内容：</h5>
+<h6>{{block.super}}用于获取父模板中block中写的内容</h6>
+{% endblock b1 %}

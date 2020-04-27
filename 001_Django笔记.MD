@@ -93,8 +93,75 @@
  
         
 # 2 创建一个入门项目 (test1项目)
+- 创建Django项目有两种方式：
+    - 方式1：终端使用django命令创建
+        - 先创建一个python项目
+        - 进入项目虚拟环境
+        - 虚拟环境下创建django项目
+        - 该方法好处：每次都是进入同一个虚拟环境，虚拟环境下可以创建多个不同的django项目，比如后面的test1,test2,test3项目
+    - 方式2：PyCharm中新建项目
+        - 方式1：创建一个全新的django项目
+            - pycharm打开后，创建项目时候就选择django
+            - 一个全新的环境就直接选择新建一个全新的虚拟环境，会自动创建虚拟环境
+            - 会自动创建项目，创建模板文件夹，moresettings里面还可以设置应用名称，自动创建应用
+        - 方式2：已有的python项目中继续创建django项目
+            - 比如Django_2020里面已经创建了test1,test2,test3项目
+            - 我们使用pycharm创建test4项目，新建项目，选择django类型
+            - 选择虚拟环境，选择Django_2020的虚拟环境即可
+            - 创建后会重新打开一个pycharm窗口，里面只有test4，看不见venv虚拟环境文件夹
+            - 我们可以关闭pycharm，然后重新打开Django_2020，里面就有test4项目
+            - 该种方法创建的项目区别：项目下面会有一个idea文件夹，pycharm自己创建的，用于关联虚拟环境
+            ![pycharm创建django项目](99_Django笔记图片/042_pycharm创建django项目.png)
+    - 建议：
+        - 直接方式1，终端创建项目，一个虚拟环境里面创建多个项目，相互独立共用一个虚拟环境
+        - 要在哪里创建项目，就跳转到文件夹下执行命令
+        - 比如新建03_test4文件夹，然后进入里面，创建test4项目
+
+- 一个完整的项目创建标准步骤参考 6.1 节创建一个 test3 项目
+    - 下面所有文件夹路径都是以项目/test3开始 
+    - 1.创建项目：
+        - 激活虚拟环境，进入02_test3文件夹下，执行创建项目命令：
+        - django-admin startproject test3
+    - 2.创建应用：
+        - 进入到test3文件夹，执行创建应用命令：
+        - python manage.py startapp booktest
+        - 创建过程及项目结构如下：    
+        ![test3项目及应用创建](99_Django笔记图片/028_test3项目及应用创建.png)  
+    - 3.在test3/settings.py中INSTALLED_APPS项安装注册应用 
+        - 'booktest',   
+    - 4.在test3/settings.py中TEMPLATES项配置模板查找路径。     
+        - 先在test3项目下创建模板文件夹templates
+        - 进入templates文件夹创建booktest文件夹
+        - 然后settings.py配置模板路径：
+        - 'DIRS': [os.path.join(BASE_DIR, 'templates')],
+    - 5.配置mysql数据库，在test3/settings.py中DATABASES项配置使用MySQL数据库
+        - 数据库直接使用test2项目，即 4.2 节已经创建好的django_test2数据库
+        - settings.py中DATABASES参数进行数据库配置,具体查看settings.py文件，直接注释掉DATABASES原有所有内容的然后复制一份过去
+        - 注意：启动django之前要启动mysql服务器
+    - 6.配置静态文件夹路径
+        - test3文件下，创建static文件夹，里面一般创建css,images,js三个文件夹，用于放置静态文件
+        - STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件的保存目录   
+    - 7.本地化设置，设置中国语言和上海时间,具体查看settings.py文件：
+        - LANGUAGE_CODE = 'zh-hans' #使用中国语言
+        - TIME_ZONE = 'Asia/Shanghai' #使用中国上海时间，django设计时候没有北京时间
+    - 8.使用模型(Model)
+        - 定义模型类
+        - 执行迁移：生成迁移命令，执行迁移命令
+        - 具体查看3.2节
+    - 9.使用视图(View)
+        - 1.定义booktest/views.py视图函数
+        - 2.配置URLconf，分别配置项目和应用(自己新建)下的urls.py文件,将视图函数和url对应起来
+        - 具体查看3.4节和6.2节
+    - 10.使用模板(Template)
+        - 创建模板文件夹，定义模板文件，使用模板文件
+        - 具体使用查看7.1节模板的使用
+    - 11.后台管理员
+        - 设置后台管理员admin超级账号
+        - 具体查看 3.3 节 后台管理
+
+
 ## 2.1 创建 Django 项目
-- 虚拟环境下，进入 01_StartProject 目录下执行创建项目命令：
+- Django_2020的python项目虚拟环境下，进入 01_StartProject 目录下执行创建项目命令：
     - django-admin startproject test1   
     - tree /f  查看文件夹 tree 树形结构
     ![创建Django项目](99_Django笔记图片/004_创建Django项目.png)
@@ -543,6 +610,9 @@
   
 
 # 5 模型(Model)深入
+- 模型类创建、操作、及mysql数据库操作查看第4章test2项目
+    - test1项目，使用是默认的sqlite3数据库
+    - 注意：不同的项目使用同一个数据库时候，不同项目里面的模型类名称不要重复，不然会出错
 ## 5.1 定义属性
 - Django根据属性的类型确定以下信息：
     - 当前选择的数据库支持字段的类型
@@ -1142,7 +1212,7 @@ class AreaInfo(models.Model):
     - 参考上面代码中的Meta部分代码及说明 
     
 
-# 6 视图(View)深入
+# 6 视图 (View) 深入 (test3项目)
 - 视图就是python中的函数，视图一般被定义在"应用/views.py"文件中，此例中为"booktest/views.py"文件。
 - 视图必须返回一个HttpResponse对象或子对象作为响应。
 - 响应可以是一张网页的HTML内容，一个重定向，一个404错误等。
@@ -1169,9 +1239,29 @@ class AreaInfo(models.Model):
     - 然后settings.py配置模板路径：
     - 'DIRS': [os.path.join(BASE_DIR, 'templates')],
 - 5.配置mysql数据库，在test3/settings.py中DATABASES项配置使用MySQL数据库
-    - 数据库直接使用test2项目，即 4.2 节已经创建好的django_test2数据库
-    - settings.py中DATABASES参数进行数据库配置,具体查看settings.py文件
+    - 数据库直接使用test2项目，即 4.2 节已经创建好的django_test2数据库(test3项目中未涉及新建模型类)
+    - settings.py中DATABASES参数进行数据库配置,具体查看settings.py文件，直接注释掉DATABASES原有所有内容的然后复制一份过去
     - 注意：启动django之前要启动mysql服务器
+- 6.配置静态文件夹路径
+    - test3文件下，创建static文件夹，里面一般创建css,images,js三个文件夹，用于放置静态文件
+    - STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件的保存目录   
+- 7.本地化设置，设置中国语言和上海时间,具体查看settings.py文件：
+    - LANGUAGE_CODE = 'zh-hans' #使用中国语言
+    - TIME_ZONE = 'Asia/Shanghai' #使用中国上海时间，django设计时候没有北京时间
+- 8.使用模型(Model)
+    - 定义模型类
+    - 执行迁移：生成迁移命令，执行迁移命令
+    - 具体查看3.2节
+- 9.使用视图(View)
+    - 1.定义booktest/views.py视图函数
+    - 2.配置URLconf，分别配置项目和应用(自己新建)下的urls.py文件,将视图函数和url对应起来
+    - 具体查看3.4节和6.2节
+- 10.使用模板(Template)
+    - 创建模板文件夹，定义模板文件，使用模板文件
+    - 具体使用查看7.1节模板的使用
+- 11.后台管理员
+    - 设置后台管理员admin超级账号
+    - 具体查看 3.3 节 后台管理
 
 ## 6.2 使用视图(view)过程
 - 视图就是一个python函数，被定义在"应用/views.py"文件中。 使用视图时需要进行两方面操作，两个操作不分先后。
@@ -1598,4 +1688,221 @@ class AreaInfo(models.Model):
     - login函数检查session中是否有islogin值，有的话表示有登录信息，直接进行跳转到登录后显示的页面
     - 此时访问：http://127.0.0.1:8000/login，需要登录
     - 第二次方法，直接跳转到首页了，自动跳过登录了
+
+
+# 7 模板 (Template) 深入 (test4项目)
+- 模板的作用：
+    - 作为Web框架，Django提供了模板，用于编写html代码，还可以嵌入模板代码更快更方便的完成页面开发，
+    - 再通过在视图中渲染模板，将生成最终的html字符串返回给客户端浏览器。
+    - 模版致力于表达外观，而不是程序逻辑。
+    - 模板的设计实现了业务逻辑view与显示内容template的分离，
+    - 一个视图可以使用任意一个模板，一个模板可以供多个视图使用。
+
+- 模板文件包含两部分内容：
+    - 1)静态内容：css,js,html。
+    - 2)动态内容：用于动态去产生一些网页内容。通过模板语言来产生。
+
+- Django处理模板：
+    - Django模板语言，简写DTL，定义在django.template包中。 
+    - 创建项目后，在"项目名称/settings.py"文件中定义了关于模板的配置。
+    - DIRS定义一个目录列表，模板引擎按列表顺序搜索这些目录以查找模板文件，通常是在项目的根目录下创建templates目录。
+    - Django处理模板分为两个阶段：
+        - 1.加载：根据给定的路径找到模板文件，编译后放在内存中。
+        - 2.渲染：使用上下文数据对模板插值并返回生成的字符串。
+    - 为了减少开发人员重复编写加载、渲染的代码，Django提供了简写函数render，用于调用模板。
+
+- 模板文件加载顺序：
+    - 1)首先去配置settings.py的TEMPLATES中配置的模板目录templates下面去找模板文件。
+    - 2)去INSTALLED_APPS下面的每个应用的templates路径去找模板文件，前提是应用中必须有templates文件夹
+
+## 7.1 模板文件使用 (创建test4项目)
+- 创建项目test4，具体创建步骤查看6.1节test3项目标准步骤 
+    - test4项目创建有以下两点不同：
+    - 1.新建一个数据库，建立模型类映射：
+        - 项目test4自己创建一个新的数据库django_test4
+        - create database django_test4 charset=utf8;
+        - settings里面数据库名称修改为django_test4，其它设置不变
+        - 然后执行迁移，和数据库建立联系：
+            - python manage.py makemigrations
+            - python manage.py migrate
+            - 此时数据库查询，show tables 就显示了django相关数据表
+    - 2.创建管理员
+        - 使用了新的数据库，需要重新创建管理员，才能访问后台
+        - 创建管理员命令：python manage.py createsuperuser
+        - 用户名：admin  邮箱和密码自定义设置（182...@qq.com, z1z)
+        - 接下来启动服务器：python manage.py runserver （退出服务器 ctrl + c 短按或长按）
+        - 打开浏览器，在地址栏中输入如下地址后回车：http://127.0.0.1:8000/admin/
+        - 输入前面创建的用户名、密码完成登录
+        - 进入后台后就可以添加图书和英雄信息
+
+
+- 模板文件使用步骤：
+    - 1.加载模板文件(loader.get_template)，获取模板文件的内容，获取一个模板对象
+        - temp = loader.get_template('booktest/index.html')  # 文件夹路径是templates下开始
+    - 2.定义模板上下文,给模板文件传递数据
+        - context = {}
+    - 3.模板渲染产生html页面内容 render, 用传递的数据替换相应的变量，产生一个替换后的标准的html内容
+        - res_html = temp.render(context)
+    - 4.返回内容给浏览器 
+        - return HttpResponse(res_html)
+    - 上面四步可以自己封装为一个自己的my_render函数
+    - django框架已经封装好了一个render函数可以直接使用
+        - render(request, 'booktest/index.html', {})
+    - 具体使用查看test4/booktest/views.py中的index、my_render、index1函数，里面有详细注释
+
+## 7.2 模板语言---模板变量
+- 模板变量名是由数字，字母，下划线和点组成的，不能以下划线开头。
+- 使用模板变量(html页面中使用)：{{模板变量名}}
+- 模板变量的解析顺序：
+    - 例如：{{book.btitle}}
+        - 1)首先把book当成一个字典，把btitle当成键名，进行取值book['btitle']
+        - 2)把book当成一个对象，把btitle当成属性，进行取值book.btitle
+        - 3)把book当成一个对象，把btitle当成对象的方法，进行取值book.btitle
+    - 例如：{{book.0}}
+        - 1)首先把book当成一个字典，把0当成键名，进行取值book[0]
+        - 2)把book当成一个列表，把0当成下标，进行取值book[0]
+    - 如果解析失败，则产生内容时用空字符串填充模板变量。
+- 重点：
+    - 使用模板变量时，.点前面的book的可能是一个字典，可能是一个对象，还可能是一个列表。
+    - 但是最常用的是字典，点前面是字典，点后面是字典的一个键名，然后取出键的值
+    - 举例
+    ```python
+    my_dict = {'title': '编程'}          # 字典
+    my_list = [1, 2, 3]                  # 列表
+    book = BookInfo.objects.get(id=1)    # 模型类的查询到的一个实例对象
     
+    # html文件里面使用变量
+    # {{ my_dict.title }}
+    # {{ my_list.1 }}
+    # {{ book.title }}
+    ```
+
+## 7.3 模板语言---模板标签
+- 案例演示：
+    - 查看test4/booktest/views.py中temp_tags函数和temp_tags.html
+    - 模板标签详细使用查看第4章的test2项目，里面模板的index.html和detail.html展示了模板标签详细使用
+
+- 模板标签，就是写在html页面里面的代码段
+    - 语法如下：
+    - {%代码段%}
+    - 代码段和%之间可以空一格，更加美观，模板变量也可以空格
+
+- for标签语法如下：
+    ```
+    {%for item in 列表%}
+    循环逻辑
+    {{forloop.counter}}   表示当前是第几次循环，从1开始，即遍历到第几次
+    {%empty%}
+    列表为空或不存在时执行此逻辑
+    {%endfor%}
+    ```
+
+- if标签语法如下：
+    ```
+    {%if ...%}
+    逻辑1
+    {%elif ...%}
+    逻辑2
+    {%else%}
+    逻辑3
+    {%endif%}
+    ```
+
+- 比较运算符如下：
+    - 特别注意：运算符左右两侧不能紧挨变量或常量，必须有空格。
+    ```
+    ==
+    !=
+    <
+    >
+    <=
+    >=
+    ```
+
+- 布尔运算符如下：
+    ```
+    and
+    or
+    not
+    ```
+
+## 7.4 模板语言---过滤器
+- 过滤器用于对模板变量进行操作。
+    - date：改变日期的显示格式。
+    - length:求长度。字符串，列表.
+    - default:设置模板变量的默认值。
+
+- 语法如下:
+    - 使用管道符号|来应用过滤器，用于进行计算、转换操作，可以使用在变量、标签中。
+    - 如果过滤器需要参数，则使用冒号:传递参数。
+    - 模板变量|过滤器:参数
+
+- 常用过滤器使用：
+    - 长度length，返回字符串包含字符的个数，或列表、元组、字典的元素个数。
+        - {{ book.btitle|length }}
+    - 默认值default，如果变量不存在时则返回默认值。
+        - data|default:'默认值'
+    - 日期date，用于对日期类型的值进行字符串格式化，常用的格式化字符如下：
+        - Y表示年，格式为4位，y表示两位的年。
+        - m表示月，格式为01,02,12等。
+        - d表示日, 格式为01,02等。
+        - j表示日，格式为1,2等。
+        - H表示时，24进制，h表示12进制的时。
+        - i表示分，为0-59。
+        - s表示秒，为0-59。
+        - {{ book.bpub_date|date:"Y年-m月-d日" }} 相当于把出版日期格式化输出
+        - 结果：1995-12-24
+
+## 7.4 模板语言---模板注释
+- 在模板中使用如下模板注释，这段代码不会被编译，不会输出到客户端；html注释只能注释html内容，不能注释模板语言。
+- 注意：模板注释浏览器html源代码是看不见的，但是html注释源代码是可以看见的
+- 1）单行注释语法如下：
+    - {#...#}
+    - 注释可以包含任何模版代码，有效的或者无效的都可以。
+    - {# { % if foo % }bar{ % else % } #}
+
+- 2）多行注释使用comment标签，语法如下：
+    - {%comment%}
+    - ...
+    - {%endcomment%}
+
+## 7.5 模板继承
+- 查看test4/booktest/views.py中temp_inherit函数和base.html及child.html
+
+- 模板继承和类的继承含义是一样的，主要是为了提高代码重用，减轻开发人员的工作量。
+    - 典型应用：网站的头部、尾部信息。
+    ![模板继承](99_Django笔记图片/043_模板继承.png)
+
+- 父模板
+    - 如果发现在多个模板中某些内容相同，那就应该把这段内容定义到父模板中。
+    - 标签block：用于在父模板中预留区域，留给子模板填充差异性的内容，名字不能相同。 
+    - 为了更好的可读性，建议给endblock标签写上名字，这个名字与对应的block名字相同。
+    - 父模板中也可以使用上下文中传递过来的数据。
+    - 格式：
+        ```
+        {% block 块名 %}
+        预留区域，可以编写默认内容，也可以没有默认内容,子模板重写，该父模板内容就直接被覆盖
+        {% endblock 块名 %}
+        ```
+
+- 子模板
+    - 标签extends：继承，写在子模板文件的第一行。
+    - 格式如下：
+        - {% extends '父模板路径' %}
+        - {% extends 'booktest/base.html' %}
+    - 子模版不用填充父模版中的所有预留区域，如果子模版没有填充，则使用父模版定义的默认值。
+    - 填充父模板中指定名称的预留区域。
+    ```
+    {% block 名称 %}
+    实际填充内容
+    {{block.super}}用于获取父模板中block中写的内容
+    {% endblock 名称 %}
+    ```
+
+- 注意：
+    - 所有相同的内容都放在父模板中
+    - 需要重写的部分再父模板预留不同的块
+    - 子模板继承按自己需要重写某个块就可以了
+   
+
+

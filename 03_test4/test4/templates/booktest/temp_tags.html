@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模板标签</title>
+    <style>
+
+        .red {
+            background-color: red;
+        }
+        .blue {
+            background-color: red;
+        }
+
+    </style>
+</head>
+<body>
+    <div>图书信息如下：</div>
+    {#遍历图书列表#}
+    {% for book in books %}
+        <ul>
+            {% if book.id <= 1 %}
+            <li class="red">{{ forloop.counter}}-----{{book.btitle}}</li>
+            {% elif book.id <= 2 %}
+            <li class="blue">{{ forloop.counter}}-----{{book.btitle}}</li>
+            {% else %}
+            {% endif %}
+        </ul>
+    {% endfor %}
+</body>
+</html>

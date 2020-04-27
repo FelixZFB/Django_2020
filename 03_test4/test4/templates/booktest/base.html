@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>父模板文件</title>
+</head>
+<body>
+    <h1>导航条信息</h1>
+    <!--父模板预留位置，用于子模板重新预留块里面的内容-->
+    {% block b1 %}
+    预留区域，可以编写默认内容，也可以没有默认内容,子模板重写，该父模板内容就直接被覆盖
+    {% endblock b1 %}
+    <h1>版权信息</h1>
+</body>
+</html>
