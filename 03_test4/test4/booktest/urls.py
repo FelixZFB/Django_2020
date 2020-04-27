@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^index1$', views.index1), # 建立url和视图函数的联系
     url(r'^temp_tags$', views.temp_tags), # 模板标签使用
     url(r'^temp_inherit$', views.temp_inherit), # 模板继承
+    url(r'^temp_escape$', views.temp_escape), # 模板转义
 ]
 
 

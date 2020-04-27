@@ -50,3 +50,11 @@ def temp_tags(request):
 def temp_inherit(request):
     '''模板继承'''
     return render(request, 'booktest/child.html')
+
+
+# 模板转义
+# 用于处理该url请求：http://127.0.0.1:8000/temp_escape
+def temp_escape(request):
+    '''模板转义'''
+    content = {'content': '<h1>Hello World</h1>'}
+    return render(request, 'booktest/temp_escape.html', content)

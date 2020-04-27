@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML模板转义</title>
+</head>
+<body>
+    html默认模板语言自动转义，显示原始内容：<br/>
+    {{content}}<br/>
+
+    使用safe过滤器关掉模板变量转义：<br/>
+    {{content|safe}}<br/>
+
+    使用autoescape关闭模板语言转义，使用off关闭，使用on打开，可以写多个变量和模板代码段
+    {% autoescape off %}<br/>
+    {{content}}
+    {{content}}
+    {% endautoescape %}
+
+    {% autoescape on %}<br/>
+    {{content}}<br/>
+    {{content}}<br/>
+    {% endautoescape %}
+
+    模板硬编码不转义, data有数据就用data，没有就是用default后面的默认值：{{data|default:'<h1>hello</h1>'}} <br/>
+    模板硬编码手动转义，使用转移符号：{{data|default:"&lt;h1&gt;123&lt;/h1&gt;"}} <br/>
+
+</body>
+</html>
