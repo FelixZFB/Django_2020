@@ -1929,7 +1929,7 @@ class AreaInfo(models.Model):
 - 模板硬编码中的字符串默认不会经过转义，如果需要转义，那需要手动进行转义。
     - 手动将上面的符号写成转义后的符号
 
-## 7.8 登陆用户案例(修改密码)
+## 7.8 登陆用户案例(修改密码+登陆装饰器状态验证)
 - 查看test4/booktest/views.py中change_pwd、change_pwd_action函数和change_pwd.html
 
 - test3项目中登陆综合案例(已有用户名记录，记住登陆状态功能，保存cookie和session功能)升级，
@@ -1942,8 +1942,10 @@ class AreaInfo(models.Model):
     - 禁止访问 (403) CSRF验证失败. 请求被中断.
     - 初级解决方案，将settings中的该代码注释掉即可：
     - 'django.middleware.csrf.CsrfViewMiddleware',
+    - 打开CSRF防护，需要POST表单标签后面加上一个标签：{% csrf_token %}
+    - 详细参考7.9节
     
-- 登陆加上是否已经登录判断，使用装饰器
+- 登陆加上是否已经登录判断，使用装饰器：
     - 实际开发中，修改密码页面需要登录后才能访问
     - change_pwd函数需要加上验证用户是否已经登录的判断
     - 因为有很多页面都要登陆后才能访问，直接访问就跳转首页
@@ -1951,4 +1953,38 @@ class AreaInfo(models.Model):
     - 具体查看views函数中最开头的login_required装饰器函数
     - 浏览器选项，安全隐私，清楚cookie信息，然后再访问change_pwd.html就会跳转到login.html页面
 
+## 7.9 CSRF防护
+- CSRF全拼为Cross Site Request Forgery，译为跨站请求伪造。
+- CSRF指攻击者盗用了你的身份，以你的名义发送恶意请求。
+- CSRF能够做的事情包括：以你名义发送邮件，发消息，盗取你的账号，甚至于购买商品，虚拟货币转账......造成的问题包括：个人隐私泄露以及财产安全
 
+- 在7.8节中用户正常登陆，但是第三方网站可以伪造出一个和change_pwd.html页面一样的页面
+    - 模拟用户修改密码的请求，然后用户的密码就被修改了
+    - ![登陆案例流程图及CSRF攻击](99_Django笔记图片/045_登陆案例流程图及CSRF攻击.png)
+    - 上图可以看出，第三方网站可以模拟修改用户密码的请求，将其中一些表输入密码(已经有了密码值)，确认修改隐藏掉
+    - 然后只留下点击，按钮，就将密码修改了
+
+- 防止以上情况发生，解决方法：
+    - 需要使用django的CSRF中间件，默认settings里面的MIDDLEWARE就是打开的
+    - 表单post提交数据时加上{% csrf_token %}标签，加在post表单标签后面一行即可。查看login.html和change_pwd.html
+    
+- 防御原理:
+    - 1)渲染templates里面的模板文件时，会在在页面生成一个名字叫做csrfmiddlewaretoken的隐藏域。
+        - 请求网页以后，查看网页源码可以看见，请求之前html代码里面是没有的
+    - 2)同时服务器交给本地浏览器保存一个名字为csrftoken的cookie信息。
+    - 3)采用POST提交表单时，两个值都会发给服务器，服务器进行比对，如果一样，则csrf验证通过，否则失败。
+    
+    - 访问第三方伪造的网址时候：
+        - 本地浏览器已有csrftoken的cookie信息
+        - 但是，第三方网站源码里面是没有csrfmiddlewaretoken的隐藏域的
+        - 因此POST请求时候就会失败
+
+- 注意：
+    - CSRF防护只针对POST表单请求
+    - 因此，涉及到敏感信息都采用POST提交
+    
+
+## 7.10 网页验证码(防止暴力访问)
+
+
+    
