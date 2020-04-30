@@ -9,5 +9,13 @@ index的普通固定链接：
 <a href="/index">首页</a><br/>
 index使用url反向解析生成的连接：
 <a href="{% url 'booktest:index' %}">首页</a><br/>
+访问show_args/1/2固定连接：<br/>
+<a href="/show_args/1/2">/show_args/1/2</a><br/>
+访问show_args/1/2的url反向解析生成的连接：<br/>
+<a href="{% url 'booktest:show_args' 1 2 %}">/show_kwargs/3/4</a><br/>
+访问show_kwargs/3/4固定连接：<br/>
+<a href="/show_kwargs/3/4">/show_kwargs/3/4</a><br/>
+访问show_kwargs/3/4的url反向解析生成的连接：<br/>
+<a href="{% url 'booktest:show_kwargs' num1=3 num2=4 %}">/show_kwargs/3/4</a><br/>
 </body>
 </html>

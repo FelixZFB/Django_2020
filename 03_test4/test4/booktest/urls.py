@@ -35,7 +35,9 @@ urlpatterns = [
     url(r'^login_check$',views.login_check), # 用户校验
     url(r'^change_pwd$',views.change_pwd), # 显示修改密码页面
     url(r'^change_pwd_action$',views.change_pwd_action), # 修改密码处理
-    url(r'^url_reverse',views.url_reverse), # url反向解析
+    url(r'^url_reverse$',views.url_reverse), # url反向解析
+    url(r'^show_args/(\d+)/(\d+)$',views.show_args, name='show_args'), # 捕获位置参数
+    url(r'^show_kwargs/(?P<num1>\d+)/(?P<num2>\d+)$',views.show_kwargs, name='show_kwargs'), # 捕获关键字参数，使用?P<num1>标明关键字为键为num1，就是正则表达式关键字分组
 ]
 
 

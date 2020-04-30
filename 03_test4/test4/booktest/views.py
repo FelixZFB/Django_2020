@@ -157,4 +157,12 @@ def url_reverse(request):
     '''url反向解析'''
     return render(request, 'booktest/url_reverse.html')
 
+# 用于处理该url请求：http://127.0.0.1:8000/show_args/1/2
+def show_args(request, a, b):
+    '''url反向解析,捕获位置参数'''
+    return HttpResponse("位置参数分别是：" + a + "和" + b)
 
+# 用于处理该url请求：http://127.0.0.1:8000/show_kwargs/3/4
+def show_kwargs(request, num1, num2):
+    '''url反向解析,捕获位置参数'''
+    return HttpResponse("关键字参数分别是：" + num1 + "和" + num2)

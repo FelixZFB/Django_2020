@@ -2008,10 +2008,22 @@ class AreaInfo(models.Model):
         - 查看test4/urls.py，可以对比查看test3/urls.py文件
     - 应用的urls中要跳转的页面指定name参数, 查看test4/booktest/urls.py;
     - html文件中使用配置的name参数变量，href="{% url 'booktest:index' %}"，查看test4/templates/url_reverse.html;
-    
-- 此时我们将index.html修改为index3.html，其它网页只要使用了反向解析，
-- 会自动将首页链接关联为index3，此项目中演示修改需要修改一下内容：
-    - index.html 修改为 index3.html
-    - booktest/urls下的正则表达式修改为r'^index3$'
-    - booktest/views下的index函数指向地址名称需要修改为index3
 
+- 实例1：
+    - 查看test4/templates/url_reverse.html, test3/urls.py, test4/booktest/urls.py, 以及views中的url_reverse和index函数  
+    - 此时我们将index.html修改为index3.html，其它网页只要使用了反向解析，
+    - 会自动将首页链接关联为index3，此项目中演示修改需要修改一下内容：
+        - index.html 修改为 index3.html
+        - booktest/urls下的正则表达式修改为r'^index3$'
+        - booktest/views下的index函数指向地址名称需要修改为index3
+    
+- 实例2：(使用位置参数)
+    - 查看test4/templates/url_reverse.html, test3/urls.py, test4/booktest/urls.py, 以及views中的show_args函数
+    - 使用位置参数，和实例1不同就是，show_args函数中指定位置参数，html源码中要指定具体的位置参数值，比如下面的 1 和 2
+    - 比如访问：show_args/1/2  在html源码中：href="{% url 'booktest:show_args' 1 2 %}"
+
+- 实例2：(使用关键字参数)
+    - 查看test4/templates/url_reverse.html, test3/urls.py, test4/booktest/urls.py, 以及views中的show_kwargs函数
+    - 使用位置参数，和实例2不同就是，show_kwargs函数中指定关键字参数名称和urls.py中一致，
+    - html源码中要指定具体的关键字参数的值，比如下面的num1=3 和 num2=4
+    - 比如访问：show_args/3/4  在html源码中：href="{% url 'booktest:show_kwargs' num1=3 num2=4 %}"
