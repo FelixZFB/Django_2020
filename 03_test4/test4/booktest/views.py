@@ -152,3 +152,9 @@ def change_pwd_action(request):
     # 3.返回一个应答
     return HttpResponse('%s密码已经修改为：%s' %(username, pwd))
 
+# 用于处理该url请求：http://127.0.0.1:8000/url_reverse
+def url_reverse(request):
+    '''url反向解析'''
+    return render(request, 'booktest/url_reverse.html')
+
+

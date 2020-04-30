@@ -1992,4 +1992,26 @@ class AreaInfo(models.Model):
 - 将用户输入的验证码和session中的验证码进行对比
 - 验证码正确，才进行账号验证进一步操作，否则就刷新验证码
 
-- 详细案例查看html教程的4.5节验证码   
+- 详细案例查看html教程的4.5节验证码  
+
+
+## 7.11 url反向解析 
+- 当某一个url配置的地址发生变化时，页面上使用反向解析生成地址的位置不需要发生变化。
+- 根据url正则表达式的配置动态的生成url。
+- 比如大量网页内部都使用了网站首页index，如果首页地址发生变化，需要修改大量网页源码中的index为新首页地址
+- url反向解析，网页源码中使用的是自动关联的变量，只需要修改少量代码即可
+
+- 具体步骤：
+    - 在项目urls中：
+        - 包含具体应用的urls文件时指定namespace参数，
+        - 同时include的第一个参数由'booktest.urls'，修改为元组('booktest.urls', 'booktest')
+        - 查看test4/urls.py，可以对比查看test3/urls.py文件
+    - 应用的urls中要跳转的页面指定name参数, 查看test4/booktest/urls.py;
+    - html文件中使用配置的name参数变量，href="{% url 'booktest:index' %}"，查看test4/templates/url_reverse.html;
+    
+- 此时我们将index.html修改为index3.html，其它网页只要使用了反向解析，
+- 会自动将首页链接关联为index3，此项目中演示修改需要修改一下内容：
+    - index.html 修改为 index3.html
+    - booktest/urls下的正则表达式修改为r'^index3$'
+    - booktest/views下的index函数指向地址名称需要修改为index3
+
