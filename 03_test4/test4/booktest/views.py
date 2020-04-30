@@ -166,3 +166,22 @@ def show_args(request, a, b):
 def show_kwargs(request, num1, num2):
     '''url反向解析,捕获位置参数'''
     return HttpResponse("关键字参数分别是：" + num1 + "和" + num2)
+
+from django.urls import reverse
+# 用于处理该url请求：http://127.0.0.1:8000/test_redirect
+def test_redirect(request):
+    # 重定向到首页
+    # return redirect('/index')
+    # 如果大量网页重定向到index，但是index地址发生修改，需要修改大量视图中的重定向地址
+    # url反向解析动态生成,此时首页地址会自动根据urls.py里面的配置自动反向解析生成
+    url = reverse('booktest:index')
+    return redirect(url)
+
+    # 重定向使用位置参数
+    #     # /show_args/1/2
+    #     # url = reverse('booktest:show_args', args=(1, 2))
+
+    # 重定向使用关键字参数
+    # /show_args/3/4
+    # url = reverse('booktest:show_args', kwargs={'num1': 3, 'num2': 4})
+

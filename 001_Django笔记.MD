@@ -2008,7 +2008,11 @@ class AreaInfo(models.Model):
         - 查看test4/urls.py，可以对比查看test3/urls.py文件
     - 应用的urls中要跳转的页面指定name参数, 查看test4/booktest/urls.py;
     - html文件中使用配置的name参数变量，href="{% url 'booktest:index' %}"，查看test4/templates/url_reverse.html;
-
+    - 注意：
+        - 指定name参数的网址，是会可能后期修改会影响其它大量部分的网址
+        - 需要反向解析的网址，就给指定name参数，name参数一般和原始网址保持一致
+    
+    
 - 实例1：
     - 查看test4/templates/url_reverse.html, test3/urls.py, test4/booktest/urls.py, 以及views中的url_reverse和index函数  
     - 此时我们将index.html修改为index3.html，其它网页只要使用了反向解析，
@@ -2022,8 +2026,18 @@ class AreaInfo(models.Model):
     - 使用位置参数，和实例1不同就是，show_args函数中指定位置参数，html源码中要指定具体的位置参数值，比如下面的 1 和 2
     - 比如访问：show_args/1/2  在html源码中：href="{% url 'booktest:show_args' 1 2 %}"
 
-- 实例2：(使用关键字参数)
+- 实例3：(使用关键字参数)
     - 查看test4/templates/url_reverse.html, test3/urls.py, test4/booktest/urls.py, 以及views中的show_kwargs函数
     - 使用位置参数，和实例2不同就是，show_kwargs函数中指定关键字参数名称和urls.py中一致，
     - html源码中要指定具体的关键字参数的值，比如下面的num1=3 和 num2=4
     - 比如访问：show_args/3/4  在html源码中：href="{% url 'booktest:show_kwargs' num1=3 num2=4 %}"
+
+- 视图中使用url反向解析：
+    - 先导入reverse函数：from django.urls import reverse
+    - 无参数：
+        - reverse('namespace名字:name名字')
+    - 如果有位置参数
+        - reverse('namespace名字:name名字', args=位置参数元组)
+    - 如果有关键字参数
+        - reverse('namespace名字:name名字', kwargs=字典)
+    - 具体使用查看views.py中的test_redirect函数

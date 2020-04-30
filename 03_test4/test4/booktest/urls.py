@@ -26,7 +26,7 @@ from booktest import views   #导入视图模块
 urlpatterns = [
     # r表示一个纯字符串，^表示从字符串开头开始匹配
     # 第一个参数是一个正则表达式，第二个参数网址匹配成功后调用的处理方法
-    url(r'^index$', views.index, name='index'), # 建立url和视图函数的联系
+    url(r'^index$', views.index, name='index'), # 建立url和视图函数的联系，指定name参数，会自动将name的值和前面正则表达式中值进行动态匹配
     url(r'^index1$', views.index1), # 建立url和视图函数的联系
     url(r'^temp_tags$', views.temp_tags), # 模板标签使用
     url(r'^temp_inherit$', views.temp_inherit), # 模板继承
@@ -35,9 +35,10 @@ urlpatterns = [
     url(r'^login_check$',views.login_check), # 用户校验
     url(r'^change_pwd$',views.change_pwd), # 显示修改密码页面
     url(r'^change_pwd_action$',views.change_pwd_action), # 修改密码处理
-    url(r'^url_reverse$',views.url_reverse), # url反向解析
+    url(r'^url_reverse$',views.url_reverse), # url反向解析网页，反向解析首页index
     url(r'^show_args/(\d+)/(\d+)$',views.show_args, name='show_args'), # 捕获位置参数
     url(r'^show_kwargs/(?P<num1>\d+)/(?P<num2>\d+)$',views.show_kwargs, name='show_kwargs'), # 捕获关键字参数，使用?P<num1>标明关键字为键为num1，就是正则表达式关键字分组
+    url(r'^test_redirect$',views.test_redirect), # 视图使用url反向解析
 ]
 
 
