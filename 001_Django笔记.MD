@@ -2011,8 +2011,7 @@ class AreaInfo(models.Model):
     - 注意：
         - 指定name参数的网址，是会可能后期修改会影响其它大量部分的网址
         - 需要反向解析的网址，就给指定name参数，name参数一般和原始网址保持一致
-    
-    
+       
 - 实例1：
     - 查看test4/templates/url_reverse.html, test3/urls.py, test4/booktest/urls.py, 以及views中的url_reverse和index函数  
     - 此时我们将index.html修改为index3.html，其它网页只要使用了反向解析，
