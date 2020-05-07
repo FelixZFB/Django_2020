@@ -205,7 +205,7 @@
     - ctrl + c  退出服务器，按下后需要等待一小会儿才会停止服务器
 
 
-# 3 Django 基本知识
+# 3 Django 基本知识 (test1项目)
 - Django 项目整体说明，以第 2 节创建的 test1 为例
     - /test1/test1 里面是django项目整体配置
     - /test1/booktest 里面是应用的相关配置
@@ -346,6 +346,7 @@
         - Django提供了自定义管理页面的功能，比如列表页要显示哪些值。
         - 打开booktest/admin.py文件，自定义类，继承自admin.ModelAdmin类
         - 详细说明查看admin.py文件及其注释
+        - 查看test1和test2项目里面admin.py的区别
     - 注意：
         - 后台管理默认显示的是
             - Bookinfo object(1)  
@@ -609,7 +610,7 @@
     ![图书列表展示_图书详情展示_新增图书_删除图书](99_Django笔记图片/022_图书列表展示_图书详情展示_新增图书_删除图书.png)     
   
 
-# 5 模型(Model)深入
+# 5 模型(Model)深入 (test2项目)
 - 模型类创建、操作、及mysql数据库操作查看第4章test2项目
     - test1项目，使用是默认的sqlite3数据库
     - 注意：不同的项目使用同一个数据库时候，不同项目里面的模型类名称不要重复，不然会出错
@@ -2131,3 +2132,6 @@ class AreaInfo(models.Model):
     - 具体查看test4/booktest/middleware.py代码及下图
     - ![中间件干预请求和应答](99_Django笔记图片/048_中间件干预请求和应答.png)
     
+## 8.3 后台管理
+- 后台管理查看第 3.3 节 后台管理 (admin.py)
+- 查看test1和test2项目的admin.py文件，里面具体的模型类注册
