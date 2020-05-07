@@ -2040,3 +2040,67 @@ class AreaInfo(models.Model):
     - 如果有关键字参数
         - reverse('namespace名字:name名字', kwargs=字典)
     - 具体使用查看views.py中的test_redirect函数
+    
+
+# 8 Django 常用功能 (test4项目)
+# 8.1 静态文件
+- 项目中的CSS、图片、js都是静态文件。
+    - 一般会将静态文件放到一个单独的目录中，以方便管理。
+    - 在html页面中调用时，也需要指定静态文件的路径，Django中提供了一种解析的方式配置静态文件路径。
+    - 静态文件可以放在项目根目录下，也可以放在应用的目录下，由于有些静态文件在项目中是通用的，
+    - 所以推荐放在项目的根目录下/test4/static，方便管理。
+
+- 静态文件使用：
+    - 查看/test4/static文件夹，test4/booktest/views.py中static_test函数，templates文件夹中的static_test.html
+    - settings.py配置静态文件对应的URL地址和访问路径
+        - STATIC_URL = '/static/'
+        - STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+        - STATIC_URL设置静态文件访问的URL，出于安全我们可以对其进行修改，即重新命名
+        - 具体查看settings及static_test.html
+
+- 静态文件加载路径
+    - 加载目录
+    - STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder', 'django.contrib.staticfiles.finders.AppDirectoriesFinder')
+    - 先去项目下面找，然后再去应用下面去找
+    
+- 动态获取STATIC_URL
+    - 具体查看static_test.html代码及注释
+    - 说明：这种方案可以隐藏真实的静态文件路径，但是结合Nginx布署时，会将所有的静态文件都交给Nginx处理，而不用转到Django部分，所以这项配置就无效了。
+    - ![动态获取静态文件URL地址](99_Django笔记图片/046_动态获取静态文件URL地址.png)
+    
+## 8.2 中间件
+- Django中间件介绍：    
+    - Django中的中间件是一个轻量级、底层的插件系统，可以介入Django的请求和响应处理过程，
+    - 修改Django的输入或输出。中间件的设计为开发者提供了一种无侵入式的开发方式，
+    - 增强了Django框架的健壮性，其它的MVC框架也有这个功能，名称为IoC。
+ 
+- Django在中间件中预置了五个方法，这五个方法的区别在于不同的阶段执行，对输入或输出进行干预，方法如下：
+    - 1）初始化：无需任何参数，服务器响应第一个请求的时候调用一次，用于确定是否启用当前中间件。
+        - def __init__(self):
+        - pass
+    - 2）处理请求前：在每个请求上，request对象产生之后，url匹配之前调用，返回None或HttpResponse对象。
+        - def process_request(self, request):
+        - pass
+    - 3）处理视图前：在每个请求上，url匹配之后，视图函数调用之前调用，返回None或HttpResponse对象。
+        - def process_view(self, request, view_func, *view_args, **view_kwargs):
+        - pass
+    - 4）处理响应后：视图函数调用之后，所有响应返回浏览器之前被调用，在每个请求上调用，返回HttpResponse对象。
+        - def process_response(self, request, response):
+        - pass
+    - 5）异常处理：当视图抛出异常时调用，在每个请求上调用，返回一个HttpResponse对象。
+        - def process_exception(self, request,exception):
+        - pass      
+        - 如果注册的多个中间件类中包含process_exception函数的时候，
+        - 调用的顺序跟注册的顺序是相反的。即先注册的后执行。
+
+- 禁止某个IP访问单个网址
+    - 视图函数中定义限制的IP
+    - 具体查看test4/booktest/views.py中index2函数，templates文件夹中的index2.html    
+    
+- 中间件使用演示：
+    - 可以使用中间件禁止IP访问网站所有资源
+    - 具体查看test4/booktest/middleware.py代码，settings.py中中间件
+    - 设置中间件类后，需要进settings中进行注册
+    - 报错：TypeError: BlockedIPSMiddleware() takes no arguments
+    - 解决方法：https://blog.csdn.net/L_obsession/article/details/103439724
+

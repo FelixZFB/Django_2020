@@ -185,3 +185,24 @@ def test_redirect(request):
     # /show_args/3/4
     # url = reverse('booktest:show_args', kwargs={'num1': 3, 'num2': 4})
 
+
+# 静态文件使用
+# 用于处理该url请求：http://127.0.0.1:8000/static_test
+def static_test(request):
+    '''静态文件使用'''
+    return render(request, 'booktest/static_test.html')
+
+# 用于处理该url请求：http://127.0.0.1:8000/index2
+# 禁止访问单个网址
+EXCLUDE_IPS = ['127.0.0.1']
+def index2(request):
+    '''首页2'''
+    # 浏览器用户的ip地址
+    user_ip = request.META['REMOTE_ADDR']
+    # 本地访问就是127.0.0.1
+    print(user_ip)
+    # 可以设置禁止访问的IP地址
+    if user_ip in EXCLUDE_IPS:
+        return HttpResponse('<h1>用户IP禁止访问</h1>')
+    else:
+        return render(request, 'booktest/index2.html')

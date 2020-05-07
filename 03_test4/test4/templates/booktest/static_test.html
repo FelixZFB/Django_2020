@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!--1.首先加载静态文件夹路径-->
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>静态文件</title>
+</head>
+<body>
+    <h1>静态文件夹图片演示</h1>
+    <!--STATIC_URL已经进行了自定义，所以第一张图片已经访问不到了-->
+    <img src="/static/images/test.jpg"><br>
+    <img src="/abc/images/test.jpg"><br>
+    <h3>动态获取STATIC_URL，拼接得到静态文件路径</h3>
+    <!--2.动态获取STATIC_URL拼接-->
+    <img src="{% static 'images/test.jpg' %}">
+</body>
+</html>

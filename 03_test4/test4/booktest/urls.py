@@ -39,6 +39,10 @@ urlpatterns = [
     url(r'^show_args/(\d+)/(\d+)$',views.show_args, name='show_args'), # 捕获位置参数
     url(r'^show_kwargs/(?P<num1>\d+)/(?P<num2>\d+)$',views.show_kwargs, name='show_kwargs'), # 捕获关键字参数，使用?P<num1>标明关键字为键为num1，就是正则表达式关键字分组
     url(r'^test_redirect$',views.test_redirect), # 视图使用url反向解析
+
+    url(r'^static_test$',views.static_test), # 静态文件使用
+    url(r'^index2$',views.index2), # 首页2
+
 ]
 
 

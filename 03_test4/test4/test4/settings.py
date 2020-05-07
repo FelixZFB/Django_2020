@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'booktest.middleware.BlockIPSMiddleware', # 注册自定义的中间件类
 ]
 
 ROOT_URLCONF = 'test4.urls'
@@ -139,5 +140,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+# 设置访问静态文件对应的url地址，默认是static，我们可以对其修改
+# STATIC_URL = '/static/'
+# 将默认的static修改为abc，此时模板html文件源码中就要使用abc，使用static就访问不到静态文件了
+STATIC_URL = '/abc/'
+# 设置静态文件存放的物理文件夹目录
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件的保存目录
