@@ -42,6 +42,7 @@ urlpatterns = [
 
     url(r'^static_test$',views.static_test), # 静态文件使用
     url(r'^index2$',views.index2), # 首页2
+    url(r'^index3$',views.index3), # 首页3
 
 ]
 

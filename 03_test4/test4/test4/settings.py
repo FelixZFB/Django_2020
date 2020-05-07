@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'booktest.middleware.BlockIPSMiddleware', # 注册自定义的中间件类
+    'booktest.middleware.TestMiddleware', # 注册自定义的中间件类
 ]
 
 ROOT_URLCONF = 'test4.urls'

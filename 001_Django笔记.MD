@@ -2092,15 +2092,42 @@ class AreaInfo(models.Model):
         - pass      
         - 如果注册的多个中间件类中包含process_exception函数的时候，
         - 调用的顺序跟注册的顺序是相反的。即先注册的后执行。
+    - ![中间件执行过程](99_Django笔记图片/047_中间件执行过程.png)
 
 - 禁止某个IP访问单个网址
     - 视图函数中定义限制的IP
     - 具体查看test4/booktest/views.py中index2函数，templates文件夹中的index2.html    
     
-- 中间件使用演示：
+- 中间件使用演示1：
+    - BlockedIPSMiddleware 禁止IP访问中间件
     - 可以使用中间件禁止IP访问网站所有资源
     - 具体查看test4/booktest/middleware.py代码，settings.py中中间件
     - 设置中间件类后，需要进settings中进行注册
     - 报错：TypeError: BlockedIPSMiddleware() takes no arguments
     - 解决方法：https://blog.csdn.net/L_obsession/article/details/103439724
+    - 此时访问所有网页，都会显示IP禁止访问
+    - 演示完成后，将IP部分注释修改掉，不然所有网页本地都不能进行访问了
 
+- 中间件使用演示2：
+    - 常用中间件演示 TestMiddleware
+    - 具体查看test4/booktest/middleware.py代码，settings.py中中间件，index3.html
+    - 此时访问：http://127.0.0.1:8000/index3
+    - django后台就会显示以下内容，表明了各个中间件执行调用的顺序 
+    ```
+    System check identified no issues (0 silenced).
+    May 07, 2020 - 22:12:41
+    Django version 3.0.5, using settings 'test4.settings'
+    Starting development server at http://127.0.0.1:8000/
+    Quit the server with CTRL-BREAK.
+    -----process_request-----
+    -----process_view-----
+    -----index3-----
+    -----process_response-----
+    [07/May/2020 22:12:41] "GET /index3 HTTP/1.1" 200 145
+    ```
+
+- 中间件我们可以进行干预，提前进行response，跳过后面要执行的函数(包括中间件函数和视图函数)
+    - 中间件函数是django框架给我们预留的函数接口，让我们可以干预请求和应答的过程。
+    - 具体查看test4/booktest/middleware.py代码及下图
+    - ![中间件干预请求和应答](99_Django笔记图片/048_中间件干预请求和应答.png)
+    

@@ -206,3 +206,9 @@ def index2(request):
         return HttpResponse('<h1>用户IP禁止访问</h1>')
     else:
         return render(request, 'booktest/index2.html')
+
+# 用于处理该url请求：http://127.0.0.1:8000/index3
+def index3(request):
+    '''首页3'''
+    print('-----index3-----')
+    return render(request, 'booktest/index3.html')
