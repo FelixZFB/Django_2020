@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+# 设置项目文件夹系统路径，即使项目文件夹位置移动，项目中的使用的文件夹路径是和BASE_DIR进行拼接的，也不会受到影响
+# 下面设置中TEMPLATES模板路径和DATABASES数据库路径都是使用BASE_DIR进行拼接的
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
