@@ -2159,3 +2159,11 @@ class AreaInfo(models.Model):
     - ![后台管理_编辑列表展示页](99_Django笔记图片/049_后台管理_编辑列表展示页.png)
     - ![后台管理_列表元素详细页编辑](99_Django笔记图片/050_后台管理_列表元素详细页编辑.png)
     - 可以对比test1和test2项目后台管理默认界面，自定义后内容更加丰富
+    
+## 8.4 上传图片
+- 1.项目文件夹，一般是static下面创建media文件夹用于存放上传的图片，里面在创建具体应用对应的子文件夹
+    - test4/static/media
+    - test4/static/media/booktest
+- 2.settings里面设置文件夹路径
+    - MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media') 
+   

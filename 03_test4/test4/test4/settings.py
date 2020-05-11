@@ -147,3 +147,7 @@ USE_TZ = True
 STATIC_URL = '/abc/'
 # 设置静态文件存放的物理文件夹目录
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # 设置静态文件的保存目录
+
+
+# 设置上传文件存放的目录
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
