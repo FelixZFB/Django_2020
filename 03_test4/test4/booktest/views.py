@@ -262,6 +262,7 @@ def show_area(request, pageindex):
         # 访问：http://127.0.0.1:8000/show_area/
         pageindex = 1
         # 注意：下面的page是Page类的实例对象，即具体某一页内容的实例对象
+        # 调用Paginator实例对象即paginator的page()方法返回Page实例对象即page
         # paginator是所有分页内容的实例对象，取出某一页，得到page实例对象
         # page有很多属性，具体查看笔记里面内容和show_area.html代码
         page = paginator.page(pageindex)

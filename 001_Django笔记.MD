@@ -2214,4 +2214,31 @@ class AreaInfo(models.Model):
         - ![迁移文件管理说明](99_Django笔记图片/051_迁移文件管理说明.png)
 
 
-## 8.6 分页显示
+## 8.6 分页
+- Django提供了数据分页的类，这些类被定义在django/core/paginator.py中。 
+- 类Paginator用于对列进行一页n条数据的分页运算。类Page用于表示第m页的数据。
+- from django.core.paginator import Paginator
+- 具体查看：
+    - test4/booktest/views.py
+    - test4/booktest/urls.py
+    - test4/templates/booktest/show_area.html
+
+- Paginator类实例对象
+    - 实例对象：paginator = Paginator(areas, 5)  每页显示5条数据的实例对象
+    - 方法_init_(列表,int)：返回分页对象，第一个参数为列表数据，第二个参数为每页数据的条数。
+    - 属性count：返回对象总数。
+    - 属性num_pages：返回页面总数。
+    - 属性page_range：返回页码列表，从1开始，例如[1, 2, 3, 4]。
+    - 方法page(m)：返回Page类实例对象，表示第m页的数据，下标以1开始。
+
+Page类实例对象
+    - 实例对象：page = paginator.page(1)   第一页的实例对象
+    - 调用Paginator实例对象即paginator的page()方法返回Page实例对象即page，不需要手动构造。
+    - 属性object_list：返回当前页对象的列表。
+    - 属性number：返回当前是第几页，从1开始。
+    - 属性paginator：当前页对应的Paginator对象。
+    - page.previous_page_number 当前页面的上一页是第几页，值是数字
+    - page.next_page_number 当前页面的下一页是第几页，值是数字
+    - 方法has_next()：如果有下一页返回True。
+    - 方法has_previous()：如果有上一页返回True。
+    - 方法len()：返回当前页面对象的个数。
