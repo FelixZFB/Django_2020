@@ -2,7 +2,7 @@
 
 # test4文件夹右键标记为source root
 from django.contrib import admin
-from booktest.models import BookInfo,HeroInfo,AreaInfo
+from booktest.models import BookInfo,HeroInfo,AreaInfo,PicTest
 
 
 # 自定义管理模型类
@@ -14,6 +14,9 @@ class BookInfoAdmin(admin.ModelAdmin):
 class HeroInfoAdmin(admin.ModelAdmin):
     list_display = ['id', 'hname','hgender','hcomment', 'hbook', 'isDelete']
 
+# 图片上传管理类
+class PicTestAdmin(admin.ModelAdmin):
+    list_display = ['id', 'goods_pic']
 
 
 class AreaStackedInline(admin.StackedInline):
@@ -64,3 +67,4 @@ class AreaInfoAdmin(admin.ModelAdmin):
 admin.site.register(BookInfo, BookInfoAdmin)
 admin.site.register(HeroInfo, HeroInfoAdmin)
 admin.site.register(AreaInfo, AreaInfoAdmin)
+admin.site.register(PicTest, PicTestAdmin)

@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.template import loader, RequestContext
 from django.http import HttpResponse
 from django.template.context import Context
-from booktest.models import BookInfo
+from booktest.models import BookInfo,PicTest,AreaInfo
+from django.conf import settings
 
 # Create your views here.
 
@@ -212,3 +213,62 @@ def index3(request):
     '''首页3'''
     print('-----index3-----')
     return render(request, 'booktest/index3.html')
+
+# 上传保存图片
+# 用于处理该url请求：http://127.0.0.1:8000/pic_upload
+def pic_upload(request):
+    '''上传图片页面'''
+    return render(request,'booktest/pic_upload.html')
+
+# 用于处理该url请求：http://127.0.0.1:8000/pic_handle
+def pic_handle(request):
+    '''用于接收表单提交的图片保存图片'''
+    # request对象的FILES属性用于接收请求的文件，包括图片
+
+    # 1.获取表单上传的图片，获取上传文件的处理对象
+    # pic是input的文件类型表单name属性的值
+    f1=request.FILES.get('pic')
+
+    # 2.创建文件保存路径
+    fname='%s/booktest/%s' % (settings.MEDIA_ROOT, f1.name)
+
+    # 3.打开文件写入上传文件的内容
+    # 打开文件已二进制方式写入
+    with open(fname,'wb') as pic:
+        # f1.chunks()返回文件的一块内容，循环遍历获取所有内容
+        for c in f1.chunks():
+            pic.write(c)
+
+    # 4.在数据库中保存上传的文件记录
+    PicTest.objects.create(goods_pic='booktest/%s' % f1.name)
+
+    # 5.返回内容
+    return HttpResponse('OK,图片上传完成！')
+
+
+# 分页显示地区内容
+# 用于处理该url请求：http://127.0.0.1:8000/show_area/1
+# pageindex 是url地址传递过来的页码参数
+from django.core.paginator import Paginator
+def show_area(request, pageindex):
+    '''分页显示地区信息'''
+    # 1.查出所有省级地区信息,省份的aParent_id的值为NULL,具体查看mysql数据表
+    areas = AreaInfo.objects.filter(aParent_id__isnull=True)
+    # 2.分页，每页显示5条，返回Paginator类的实例对象paginator(名称自定义)
+    paginator = Paginator(areas, 5)
+    # 3.获取某一页的内容
+    if pageindex == '':
+        # 没有指定页码，获取第一页内容
+        # 访问：http://127.0.0.1:8000/show_area/
+        pageindex = 1
+        # 注意：下面的page是Page类的实例对象，即具体某一页内容的实例对象
+        # paginator是所有分页内容的实例对象，取出某一页，得到page实例对象
+        # page有很多属性，具体查看笔记里面内容和show_area.html代码
+        page = paginator.page(pageindex)
+    else:
+        pageindex = int(pageindex)
+        page = paginator.page(int(pageindex))
+
+    # 4.使用模板
+    return render(request, 'booktest/show_area.html',
+                  {'areas': areas, 'page': page})

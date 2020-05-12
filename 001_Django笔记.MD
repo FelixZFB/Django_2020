@@ -2161,9 +2161,57 @@ class AreaInfo(models.Model):
     - 可以对比test1和test2项目后台管理默认界面，自定义后内容更加丰富
     
 ## 8.4 上传图片
+- 方式1：admin后台管理上传图片
+- 后台管理图片需要安装Pillow
+    - pip install Pillow
 - 1.项目文件夹，一般是static下面创建media文件夹用于存放上传的图片，里面在创建具体应用对应的子文件夹
     - test4/static/media
     - test4/static/media/booktest
 - 2.settings里面设置文件夹路径
     - MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media') 
-   
+- 3.创建类，注册类
+    - models.py里面创建图片管理类,字段使用图片类型，指定文件夹参数
+    - admin.py里面自定义后台管理类然后注册类
+- 4.生成迁移文件执行迁移命令
+    - python manage.py makemigrations
+    - python manage.py migrate
+- 5.启动服务器进入后台管理
+    - 此时已有图片类，然后进去添加图片
+    - 图片就被上传到static/media/booktest文件夹下面
+    - 后台管理显示的类容是图片的路径
+    - ![后台上传图片](99_Django笔记图片/052_后台上传图片.png)
+    
+    
+- 方式2：自定义页面上传图片
+- 1.自定义上传图片html页面，查看test4/templates/booktest/pic_upload.html
+- 2.定义视图函数和配置URL
+    - 查看test4/booktests/views.py中的pic_upload和pic_handle函数
+    - 查看test4/booktests/urls.py
+- 3.HTML页面上传图片
+- ![自定义上传图片](99_Django笔记图片/053_自定义上传图片.png)
+
+- request对象有一个FILES的属性，类似于字典，通过request.FILES可以获取上传文件的处理对象。
+- 在django中，上传文件不大于2.5M,文件放在内存中。上传文件大于2.5M,文件内容写到一个临时文件中。
+- Django处理上传文件的两个类：
+    - FILE_UPLOAD_HANDLERS= ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+ 	"django.core.files.uploadhandler.TemporaryFileUploadHandler")
+ 	
+
+## 8.5 迁移文件管理
+- 迁移文件管理：
+    - 生成迁移文件，应用booktest/migrations文件夹下面根据models.py生成迁移文件
+        - 第一次执行时候，生成的迁移文件名为0001_initial.py
+        - 后面添加了新的模型，生成的文件名是0002_模型类名称小写，迁移文件dependencies依赖是0001文件
+        - 后面又添加了新的模型，生成的文件名是0003_模型类名称小写，迁移文件dependencies依赖是0002文件
+    - 执行迁移命令，生成mysql里面对应的表格
+        - 只会执行最新未执行过迁移命令的迁移文件 
+        - mysql的项目数据库中有个 django_migrations 表
+            - 表中就是对应的所有已经执行过迁移的文件
+            - 可以看见booktest下面执行过的所有迁移文件
+            - 如果要重新生成迁移文件，执行迁移命令，生成新的表就要删除迁移文件表中的文件和数据库项目下的对应表
+            - 注意删除迁移文件，只能删除应用下文件，其它不要动，使用id删除
+            - 比如：delete from django_migrations where id=17;
+        - ![迁移文件管理说明](99_Django笔记图片/051_迁移文件管理说明.png)
+
+
+## 8.6 分页显示

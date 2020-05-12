@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义上传图片</title>
+</head>
+<body>
+    <!--
+    form的属性enctype="multipart/form-data"
+    form的method为post
+    input的类型为file
+    action里面是点击上传图片后调用的视图处理函数
+    -->
+    <h1>自定义上传图片演示：</h1>
+    <form method="post" action="/pic_handle/" enctype="multipart/form-data">
+        {%csrf_token%}
+        <input type="file" name="pic"/><br>
+        <input type="submit" value="上传"><br>
+    </form>
+</body>
+</html>

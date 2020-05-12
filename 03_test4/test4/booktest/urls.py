@@ -44,6 +44,12 @@ urlpatterns = [
     url(r'^index2$',views.index2), # 首页2
     url(r'^index3$',views.index3), # 首页3
 
+    url(r'^pic_upload$', views.pic_upload), # 上传图片页面
+    url(r'^pic_handle$', views.pic_handle), # 图片保存到文件夹中
+
+    # 使用关键字分组，\d*表示匹配0个或多个
+    url(r'^show_area/(?P<pageindex>\d*)$', views.show_area), # 显示地区信息
+
 ]
 
 

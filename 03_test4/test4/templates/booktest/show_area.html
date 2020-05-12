@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分页显示地区信息</title>
+</head>
+<body>
+    <h3>一次显示全部内容</h3>
+    <ul>
+        {% for area in areas %}
+        <li>{{ area.atitle }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>分页显示内容</h3>
+    <ul>
+        <!--循环取出page实例对象中的数据，即一页中的每一条数据-->
+        {% for area in page %}
+        <li>{{ area.atitle }}</li>
+        {% endfor %}
+    </ul>
+
+    <!--如果有上一页，显示上一页的跳转链接,&lt;小于号，&gt;表示大于号-->
+    {% if page.has_previous %}
+        <a href="/show_area/{{ page.previous_page_number }}">&lt;上一页&gt;</a>
+    {% endif %}
+
+    {% for pageindex in page.paginator.page_range %}
+        <!--如果访问的是当前页面，就直接显示当前页面的数字，不显示跳转链接-->
+        {% if pageindex == page.number %}
+            {{ pageindex }}&nbsp;&nbsp;
+        <!--不是当前页面，就显示数字的跳转链接,&nbsp表示1个空格-->
+        {% else %}
+            <a href="/show_area/{{ pageindex }}">{{ pageindex }}</a>&nbsp;&nbsp;
+        {% endif %}
+    {% endfor %}
+
+    <!--如果有下一页，显示下一页的跳转链接-->
+    {% if page.has_next %}
+        <a href="/show_area/{{ page.next_page_number }}">&lt;下一页&gt;</a>
+    {% endif %}
+</body>
+</html>

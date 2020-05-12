@@ -94,7 +94,7 @@ DATABASES = {
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql', #使用mysql数据库
         'NAME': 'django_test4', #使用的数据库database的名字，已经提取创建好
-        'USER': 'root', #数据库登录用户名，默认就是root
+        'USER': 'root', #数据库登录用户名，默认使用管理员root
         'PASSWORD': '00116656', #数据库登录密码,数据库安装时候设置的用户密码
         'HOST': 'localhost', #数据库所在主机的IP地址，本机直接用localhost
         'PORT': '3306', #数据库端口，默认就是3306

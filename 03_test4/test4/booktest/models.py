@@ -91,4 +91,6 @@ class AreaInfo(models.Model):
 # 图片类，用于上传保存图片
 class PicTest(models.Model):
     '''上传图片'''
+    # upload_to参数就是上传保存图片的文件夹
+    # settings里面设置MEDIA_ROOT路径下面的文件夹，一个应用对应自己应用名称的文件夹
     goods_pic = models.ImageField(upload_to='booktest')
