@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.template import loader, RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.template.context import Context
 from booktest.models import BookInfo,PicTest,AreaInfo
 from django.conf import settings
@@ -252,7 +252,7 @@ def pic_handle(request):
 from django.core.paginator import Paginator
 def show_area(request, pageindex):
     '''分页显示地区信息'''
-    # 1.查出所有省级地区信息,省份的aParent_id的值为NULL,具体查看mysql数据表
+    # 1.查出所有省级地区信息,省份的aParent_id的值为NULL,具体查看mysql数据表,可以简写为aParent__isnull=True
     areas = AreaInfo.objects.filter(aParent_id__isnull=True)
     # 2.分页，每页显示5条，返回Paginator类的实例对象paginator(名称自定义)
     paginator = Paginator(areas, 5)
@@ -273,3 +273,48 @@ def show_area(request, pageindex):
     # 4.使用模板
     return render(request, 'booktest/show_area.html',
                   {'areas': areas, 'page': page})
+
+
+# 省市区选择
+# 用于处理该url请求：http://127.0.0.1:8000/areas
+def areas(request):
+    '''省市区选择'''
+    return render(request, 'booktest/areas.html')
+
+# 用于处理该url请求：http://127.0.0.1:8000/prov
+def prov(request):
+    '''获取所有省级地区信息'''
+    # 1.获取所有省级地区信息
+    areas = AreaInfo.objects.filter(aParent__isnull=True)
+
+    # 2.areas是一个查询集QuerySet,转换为json数据
+    areas_list = []
+    for area in areas:
+        areas_list.append((area.id, area.atitle))
+    # print(areas_list)
+    # 下面返回为json数据时候，元组自动转变为列表，可以查看网址请求后的原始数据
+
+    # 3.返回数据，HTML发过来是ajax请求，返回数据是json数据
+    # areas是一个查询集QuerySet
+    return JsonResponse({'data': areas_list})
+
+# 市 县级 地区选择
+# 用于处理该url请求：http://127.0.0.1:8000/city/pid 或者http://127.0.0.1:8000/dis/pid
+def city(request, pid):
+    '''获取省(pid)下级市级信息'''
+    # 1.获取pid对应的下级市的信息
+    # 方式1：
+    # area = AreaInfo.objects.get(id=pid)
+    # areas = area.areainfo_set.all()
+    # 方式2：
+    # 根据父级ID查询下级地区信息
+    areas = AreaInfo.objects.filter(aParent__id=pid)
+
+    # 2.变量areas并拼接出json数据：areas是一个查询集QuerySet,转换为json数据
+    areas_list = []
+    for area in areas:
+        areas_list.append((area.id, area.atitle))
+
+    # 3.返回数据，HTML发过来是ajax请求，返回数据是json数据
+    # areas是一个查询集QuerySet
+    return JsonResponse({'data': areas_list})

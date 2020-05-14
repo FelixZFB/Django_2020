@@ -2057,6 +2057,8 @@ class AreaInfo(models.Model):
         - STATIC_URL = '/static/'
         - STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
         - STATIC_URL设置静态文件访问的URL，出于安全我们可以对其进行修改，即重新命名
+        - 可以将默认的static修改为abc(相当于给静态文件夹重命名了)，此时模板html文件源码中就要使用abc，使用static就访问不到静态文件了
+        - STATIC_URL = '/abc/'
         - 具体查看settings及static_test.html
 
 - 静态文件加载路径
@@ -2219,7 +2221,7 @@ class AreaInfo(models.Model):
 - 类Paginator用于对列进行一页n条数据的分页运算。类Page用于表示第m页的数据。
 - from django.core.paginator import Paginator
 - 具体查看：
-    - test4/booktest/views.py
+    - test4/booktest/views.py 中show_area函数
     - test4/booktest/urls.py
     - test4/templates/booktest/show_area.html
 
@@ -2242,3 +2244,17 @@ Page类实例对象
     - 方法has_next()：如果有下一页返回True。
     - 方法has_previous()：如果有上一页返回True。
     - 方法len()：返回当前页面对象的个数。
+    
+## 8.7 多级选择(省市区选择)
+- 在Django中使用jquery的ajax进行数据交互。 
+    - jquery框架中提供了$.ajax、$.get、$.post方法，
+    - 用于进行异步交互，由于Django中默认使用CSRF约束，推荐使用$.get。
+    - ajax请求获取信息，使用get
+    - ajax请求涉及到信息修改，使用post
+    
+- 省市区选择案例就是使用的ajax的get请求
+    - 具体查看：
+    - test4/booktest/views.py 中的prov函数和city函数
+    - test4/booktest/urls.py
+    - test4/templates/booktest/areas.html
+    - 代码中要详细注释

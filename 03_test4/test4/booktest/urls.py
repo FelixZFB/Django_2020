@@ -49,6 +49,10 @@ urlpatterns = [
 
     # 使用关键字分组，\d*表示匹配0个或多个
     url(r'^show_area/(?P<pageindex>\d*)$', views.show_area), # 显示地区信息
+    url(r'^areas$', views.areas), # 省市区选择
+    url(r'^prov$', views.prov), # 获取所有省级地区信息，返回json格式数据
+    url(r'^city/(\d+)$', views.city), # 获取省下面市级信息
+    url(r'^dis/(\d+)$', views.city), # 获取市下面县级信息，由于查询都是通过父级ID，查询方法和市级一样，使用同一个视图函数
 
 ]
 
