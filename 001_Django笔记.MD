@@ -2257,4 +2257,4 @@ Page类实例对象
     - test4/booktest/views.py 中的prov函数和city函数
     - test4/booktest/urls.py
     - test4/templates/booktest/areas.html
-    - 代码中要详细注释
+    - 代码中有详细注释
