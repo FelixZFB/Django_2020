@@ -22,7 +22,10 @@ urlpatterns = [
     # r表示一个纯字符串，''空白表示匹配任何内容，就可以匹配到index
     # 第一个参数是一个正则表达式，第二个参数是包含的应用的urls文件
     path(r'', include(('booktest.urls', 'booktest'), namespace='booktest')), # 包含booktest应用下的urls文件
+
+    # path(r'^search/', include('haystack.urls', namespace='haystack')),
 ]
+
 
 # 访问http://127.0.0.1:8000/index网页的步骤如下：
 # 1.浏览器访问网址，django会自动提取地址/后面的 index

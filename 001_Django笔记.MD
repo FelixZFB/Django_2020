@@ -2258,3 +2258,20 @@ Page类实例对象
     - test4/booktest/urls.py
     - test4/templates/booktest/areas.html
     - 代码中有详细注释
+    
+
+# 9 部署
+## 9.1 搭建服务器虚拟环境
+- 1）在本机进入项目虚拟环境，执行命令导出当前需要的所有包。
+    - 比如进入虚拟环境后，切换到项目文件夹根目录下，执行命令：
+    - pip freeze > requirements.txt
+    - requirements.txt 里面就是项目依赖的包
+
+- 2）通过ftp软件将项目代码和requirements.txt文件上传到服务器。
+
+- 3）服务器上，创建虚拟环境，在虚拟环境上安装包。
+    - mkvirtualenv 虚拟环境名称
+    - pip install -r requirements.txt
+
+- GitHub项目拉取到不同操作系统，只保留项目本身内容，然后可以创建虚拟环境，进入虚拟环境后安装依赖包
+
